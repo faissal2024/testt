@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Experiences — Kech.go</title>
+<link rel="stylesheet" href="../css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23D4A853'/><text y='.9em' font-size='70' x='15'>K</text></svg>">
+<style>
+.tours-hero{background:var(--charcoal);padding:8rem 0 4rem;position:relative;overflow:hidden}
+.tours-hero::before{content:'';position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1548011241-9aa7ad72d1fc?w=1400&q=60') center/cover;opacity:.18}
+.tours-hero-content{position:relative;z-index:1}
+.tours-hero h1{font-family:var(--font-display);font-size:clamp(2.5rem,6vw,4rem);font-weight:300;color:white;margin-bottom:.75rem}
+.tours-hero h1 em{font-style:italic;color:var(--gold-light)}
+.tours-hero p{color:rgba(255,255,255,.6);font-size:1rem;line-height:1.7}
+.tours-count{font-size:.875rem;color:var(--text-muted);margin-bottom:1.5rem}
+.tours-count span{font-weight:700;color:var(--text-primary)}
+.sort-select{padding:.625rem 1.125rem;border:1.5px solid rgba(14,12,10,.12);border-radius:var(--radius-full);font-size:.875rem;color:var(--text-secondary);background:white;outline:none;cursor:pointer;font-family:var(--font-body)}
+.sort-select:focus{border-color:var(--gold)}
+.no-results{text-align:center;padding:5rem 2rem}
+.no-results-icon{font-size:3rem;margin-bottom:1rem;opacity:.4}
+.no-results-title{font-family:var(--font-display);font-size:1.75rem;font-weight:600;margin-bottom:.5rem}
+.no-results-text{color:var(--text-muted);margin-bottom:2rem}
+</style>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-hdr">
+    <a href="../index.html" class="nav-logo"><div class="logo-mark">K</div><span class="logo-text">Kech<span>.go</span></span></a>
+    <button class="mobile-close" id="mobileClose">✕</button>
+  </div>
+  <ul class="mobile-links">
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="tours.html">Experiences</a></li>
+    <li><a href="tours.html?category=Cultural">Culture</a></li>
+    <li><a href="tours.html?category=Adventure">Adventure</a></li>
+  </ul>
+  <div class="mobile-actions">
+    <button class="btn btn-gold" id="mobileLoginBtn">Sign In</button>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Welcome Back</h2>
+      <button class="modal-close" id="authModalClose">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="login">Sign In</button>
+      <button class="modal-tab" data-tab="signup">Create Account</button>
+    </div>
+    <div class="tab-panel active" id="loginPanel">
+      <button class="google-btn" id="googleLoginBtn">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <div class="divider-text">or with email</div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="loginEmail" placeholder="your@email.com"></div>
+      <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="loginPassword" placeholder="••••••••"><div class="form-error" id="loginError"></div></div>
+      <div class="form-group" style="margin-top:1.5rem"><button class="btn btn-gold" style="width:100%;justify-content:center" id="loginSubmitBtn">Sign In</button></div>
+    </div>
+    <div class="tab-panel" id="signupPanel">
+      <button class="google-btn" id="googleSignupBtn">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+        Sign up with Google
+      </button>
+      <div class="divider-text">or with email</div>
+      <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" id="signupName" placeholder="Your name"></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="signupEmail" placeholder="your@email.com"></div>
+      <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="signupPassword" placeholder="Min. 6 characters"><div class="form-error" id="signupError"></div></div>
+      <div class="form-group" style="margin-top:1.5rem"><button class="btn btn-gold" style="width:100%;justify-content:center" id="signupSubmitBtn">Create Account</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar light" id="navbar">
+  <a href="../index.html" class="nav-logo">
+    <div class="logo-mark">K</div>
+    <span class="logo-text">Kech<span>.go</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="tours.html">Experiences</a></li>
+    <li><a href="tours.html?category=Cultural">Culture</a></li>
+    <li><a href="tours.html?category=Adventure">Adventure</a></li>
+    <li><a href="tours.html?category=Food+%26+Drink">Food & Drink</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="nav-btn nav-btn-ghost" id="loginBtn">Sign In</button>
+    <button class="nav-btn nav-btn-primary" id="signupBtn">Get Started</button>
+    <div class="nav-user" id="navUser" style="display:none">
+      <div id="navAvatarCircle" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#D4A853,#C2673B);display:flex;align-items:center;justify-content:center;color:white;font-weight:600;font-size:.875rem;border:2px solid #D4A853"></div>
+      <span id="navUserName" style="font-size:.875rem;font-weight:500;color:var(--text-secondary)"></span>
+    </div>
+  </div>
+  <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- HERO -->
+<div class="tours-hero">
+  <div class="container tours-hero-content">
+    <div class="eyebrow" style="justify-content:flex-start;color:var(--gold);margin-bottom:.875rem">
+      <span style="width:32px;height:1.5px;background:var(--gold);opacity:.5;display:inline-block"></span>
+      Explore Morocco
+    </div>
+    <h1>All <em>Experiences</em></h1>
+    <p>Handpicked tours and activities across Morocco's most magical destinations.</p>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<section class="section-sm">
+  <div class="container">
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <span class="filter-lbl">Filter:</span>
+      <div class="filter-chips" id="filterChips">
+        <button class="chip active" data-cat="All">All</button>
+        <button class="chip" data-cat="Cultural">🏛️ Cultural</button>
+        <button class="chip" data-cat="Adventure">🏔️ Adventure</button>
+        <button class="chip" data-cat="Food & Drink">🍽️ Food & Drink</button>
+        <button class="chip" data-cat="Wellness">🧖 Wellness</button>
+        <button class="chip" data-cat="Hiking">🥾 Hiking</button>
+        <button class="chip" data-cat="Day Trips">🚌 Day Trips</button>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:1rem">
+        <select class="sort-select" id="sortSelect">
+          <option value="default">Sort: Featured</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating">Top Rated</option>
+        </select>
+      </div>
+    </div>
+    <div class="tours-count" id="toursCount"><span id="toursCountNum">0</span> experiences found</div>
+    <div class="tours-grid" id="toursGrid">
+      <!-- Skeletons -->
+      <div class="skel-card"><div class="skel-img skeleton" style="height:240px"></div><div class="skel-body" style="padding:1.5rem"><div class="skel-line skeleton med" style="height:14px;margin-bottom:.75rem"></div><div class="skel-line skeleton" style="height:14px;margin-bottom:.75rem"></div><div class="skel-line skeleton short" style="height:14px"></div></div></div>
+      <div class="skel-card"><div class="skel-img skeleton" style="height:240px"></div><div class="skel-body" style="padding:1.5rem"><div class="skel-line skeleton med" style="height:14px;margin-bottom:.75rem"></div><div class="skel-line skeleton" style="height:14px;margin-bottom:.75rem"></div><div class="skel-line skeleton short" style="height:14px"></div></div></div>
+      <div class="skel-card"><div class="skel-img skeleton" style="height:240px"></div><div class="skel-body" style="padding:1.5rem"><div class="skel-line skeleton med" style="height:14px;margin-bottom:.75rem"></div><div class="skel-line skeleton" style="height:14px;margin-bottom:.75rem"></div><div class="skel-line skeleton short" style="height:14px"></div></div></div>
+    </div>
+    <div id="noResults" class="no-results" style="display:none">
+      <div class="no-results-icon">🔍</div>
+      <div class="no-results-title">No experiences found</div>
+      <div class="no-results-text">Try a different filter or search term.</div>
+      <button class="btn btn-gold" onclick="resetFilters()">Clear Filters</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom" style="padding-top:0;border-top:none">
+      <div class="footer-copy">© 2025 Kech.go — All rights reserved.</div>
+      <div><a href="../index.html" style="color:rgba(255,255,255,.4);font-size:.875rem">← Back to Home</a></div>
+    </div>
+  </div>
+</footer>
+
+<script type="module">
+import { auth, onAuthStateChanged, loginWithGoogle, loginWithEmail, signUpWithEmail } from "../js/firebase-config.js";
+import { getTours, DEMO_TOURS } from "../js/tours-service.js";
+
+let allTours = [];
+let activeCategory = "All";
+let activeSort = "default";
+let searchQuery = "";
+
+// ── URL PARAMS ──
+const params = new URLSearchParams(window.location.search);
+if (params.get("category")) activeCategory = params.get("category");
+if (params.get("q")) searchQuery = params.get("q");
+
+// ── TOAST ──
+function showToast(msg, type="info") {
+  const c = document.getElementById("toastContainer");
+  const t = document.createElement("div");
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${type==="success"?"✅":type==="error"?"❌":"✨"}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.animation="toastOut .4s forwards"; setTimeout(()=>t.remove(),400); }, 3200);
+}
+
+// ── NAVBAR ──
+window.addEventListener("scroll", () => {
+  document.getElementById("navbar").classList.toggle("scrolled", window.scrollY > 60);
+});
+document.getElementById("navToggle").addEventListener("click", () => document.getElementById("mobileMenu").classList.add("open"));
+document.getElementById("mobileClose").addEventListener("click", () => document.getElementById("mobileMenu").classList.remove("open"));
+
+// ── AUTH MODAL ──
+function openAuthModal(tab="login") {
+  document.getElementById("authModal").classList.add("open");
+  document.querySelectorAll(".modal-tab").forEach(t => t.classList.toggle("active", t.dataset.tab===tab));
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id===tab+"Panel"));
+}
+document.getElementById("loginBtn").addEventListener("click", () => openAuthModal("login"));
+document.getElementById("signupBtn").addEventListener("click", () => openAuthModal("signup"));
+document.getElementById("mobileLoginBtn").addEventListener("click", () => openAuthModal("login"));
+document.getElementById("authModalClose").addEventListener("click", () => document.getElementById("authModal").classList.remove("open"));
+document.getElementById("authModal").addEventListener("click", e => { if(e.target===document.getElementById("authModal")) document.getElementById("authModal").classList.remove("open"); });
+document.querySelectorAll(".modal-tab").forEach(tab => tab.addEventListener("click", () => openAuthModal(tab.dataset.tab)));
+
+async function handleGoogleAuth() {
+  try {
+    const user = await loginWithGoogle();
+    document.getElementById("authModal").classList.remove("open");
+    showToast(`Welcome, ${user.displayName}! 🌟`, "success");
+  } catch(e) { showToast("Login failed. Try again.", "error"); }
+}
+document.getElementById("googleLoginBtn").addEventListener("click", handleGoogleAuth);
+document.getElementById("googleSignupBtn").addEventListener("click", handleGoogleAuth);
+
+document.getElementById("loginSubmitBtn").addEventListener("click", async () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const pass = document.getElementById("loginPassword").value;
+  if (!email || !pass) { document.getElementById("loginError").textContent="Fill all fields"; document.getElementById("loginError").classList.add("show"); return; }
+  try {
+    document.getElementById("loginSubmitBtn").textContent = "Signing in...";
+    const user = await loginWithEmail(email, pass);
+    document.getElementById("authModal").classList.remove("open");
+    showToast(`Welcome back! ✨`, "success");
+  } catch { document.getElementById("loginError").textContent="Invalid credentials"; document.getElementById("loginError").classList.add("show"); }
+  finally { document.getElementById("loginSubmitBtn").textContent = "Sign In"; }
+});
+
+document.getElementById("signupSubmitBtn").addEventListener("click", async () => {
+  const name = document.getElementById("signupName").value.trim();
+  const email = document.getElementById("signupEmail").value.trim();
+  const pass = document.getElementById("signupPassword").value;
+  if (!name||!email||pass.length<6) { document.getElementById("signupError").textContent="Please fill all fields (min 6 chars password)"; document.getElementById("signupError").classList.add("show"); return; }
+  try {
+    document.getElementById("signupSubmitBtn").textContent = "Creating...";
+    await signUpWithEmail(name, email, pass);
+    document.getElementById("authModal").classList.remove("open");
+    showToast(`Welcome to Kech.go! 🎉`, "success");
+  } catch(e) { document.getElementById("signupError").textContent = e.code==="auth/email-already-in-use"?"Email already registered":e.message; document.getElementById("signupError").classList.add("show"); }
+  finally { document.getElementById("signupSubmitBtn").textContent = "Create Account"; }
+});
+
+// ── AUTH STATE ──
+onAuthStateChanged(auth, user => {
+  const loginBtn = document.getElementById("loginBtn");
+  const signupBtn = document.getElementById("signupBtn");
+  const navUser = document.getElementById("navUser");
+  if (user) {
+    loginBtn.style.display="none"; signupBtn.style.display="none"; navUser.style.display="flex";
+    document.getElementById("navAvatarCircle").textContent = (user.displayName||user.email||"U")[0].toUpperCase();
+    document.getElementById("navUserName").textContent = user.displayName||user.email.split("@")[0];
+  } else {
+    loginBtn.style.display=""; signupBtn.style.display=""; navUser.style.display="none";
+  }
+});
+
+// ── LOAD TOURS ──
+async function loadTours() {
+  try {
+    allTours = await getTours();
+  } catch { allTours = DEMO_TOURS; }
+  // set active chip from URL
+  if (activeCategory !== "All") {
+    document.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c.dataset.cat === activeCategory));
+  }
+  renderTours();
+}
+
+function renderTours() {
+  let tours = [...allTours];
+  if (activeCategory !== "All") tours = tours.filter(t => t.category === activeCategory);
+  if (searchQuery) tours = tours.filter(t => t.title.toLowerCase().includes(searchQuery.toLowerCase()) || t.location.toLowerCase().includes(searchQuery.toLowerCase()));
+  if (activeSort === "price-asc") tours.sort((a,b) => a.price - b.price);
+  else if (activeSort === "price-desc") tours.sort((a,b) => b.price - a.price);
+  else if (activeSort === "rating") tours.sort((a,b) => (b.rating||0) - (a.rating||0));
+
+  document.getElementById("toursCountNum").textContent = tours.length;
+  const grid = document.getElementById("toursGrid");
+  const noRes = document.getElementById("noResults");
+
+  if (tours.length === 0) { grid.innerHTML=""; noRes.style.display="block"; return; }
+  noRes.style.display = "none";
+  grid.innerHTML = tours.map(tour => renderTourCard(tour)).join("");
+  grid.querySelectorAll(".wishlist-btn").forEach(btn => {
+    btn.addEventListener("click", e => { e.stopPropagation(); handleWishlist(btn); });
+  });
+  initReveal();
+}
+
+function renderTourCard(tour) {
+  const img = Array.isArray(tour.images) ? tour.images[0] : tour.images;
+  const stars = "★".repeat(Math.floor(tour.rating||0)) + "☆".repeat(5-Math.floor(tour.rating||0));
+  return `
+    <div class="tour-card reveal" onclick="window.location.href='tour-detail.html?id=${tour.id}'">
+      <div class="tc-img">
+        <img src="${img}" alt="${tour.title}" loading="lazy">
+        <div class="tc-overlay"></div>
+        <div class="tc-badges">
+          <span class="badge badge-cat">${tour.category||"Tour"}</span>
+          ${tour.featured?'<span class="badge badge-feat">Featured</span>':""}
+        </div>
+        <button class="wishlist-btn" data-id="${tour.id}" aria-label="Wishlist">🤍</button>
+      </div>
+      <div class="tc-body">
+        <div class="tc-meta">
+          <div class="tc-rating"><span class="stars">${stars}</span>${(tour.rating||0).toFixed(1)}</div>
+          <span class="tc-reviews">(${tour.reviewCount||0})</span>
+          <span class="tc-duration">🕐 ${tour.duration}</span>
+        </div>
+        <h3 class="tc-title">${tour.title}</h3>
+        <div class="tc-location">📍 ${tour.location}</div>
+        <div class="tc-footer">
+          <div>
+            <div class="price-label">From</div>
+            <div class="price-amount"><sup>$</sup>${tour.price}</div>
+            <div class="price-per">per person</div>
+          </div>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function handleWishlist(btn) {
+  if (!auth.currentUser) { openAuthModal("login"); showToast("Sign in to save favorites", "info"); return; }
+  btn.classList.toggle("active");
+  btn.textContent = btn.classList.contains("active") ? "❤️" : "🤍";
+  showToast(btn.classList.contains("active") ? "Added to wishlist ❤️" : "Removed from wishlist", "info");
+}
+
+window.resetFilters = function() {
+  activeCategory = "All"; searchQuery = "";
+  document.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c.dataset.cat==="All"));
+  renderTours();
+};
+
+// ── FILTER CHIPS ──
+document.getElementById("filterChips").addEventListener("click", e => {
+  const chip = e.target.closest(".chip");
+  if (!chip) return;
+  activeCategory = chip.dataset.cat;
+  document.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c===chip));
+  renderTours();
+});
+
+// ── SORT ──
+document.getElementById("sortSelect").addEventListener("change", e => {
+  activeSort = e.target.value;
+  renderTours();
+});
+
+// ── SCROLL REVEAL ──
+function initReveal() {
+  const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add("visible"); }), {threshold:.08,rootMargin:"0px 0px -40px 0px"});
+  document.querySelectorAll(".reveal").forEach(el => obs.observe(el));
+}
+
+loadTours();
+</script>
+</body>
+</html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Tour Detail — Kech.go</title>
+<link rel="stylesheet" href="../css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23D4A853'/><text y='.9em' font-size='70' x='15'>K</text></svg>">
+<style>
+.detail-hero{position:relative;height:65vh;min-height:500px;overflow:hidden;background:var(--charcoal)}
+.detail-hero-slider{display:flex;height:100%;transition:transform .6s cubic-bezier(0.16,1,0.3,1)}
+.detail-hero-slide{min-width:100%;height:100%;flex-shrink:0}
+.detail-hero-slide img{width:100%;height:100%;object-fit:cover}
+.slider-btn{position:absolute;top:50%;transform:translateY(-50%);z-index:10;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.9);border:none;font-size:1.25rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.slider-btn:hover{background:white;transform:translateY(-50%) scale(1.05)}
+.slider-prev{left:1.5rem}.slider-next{right:1.5rem}
+.slider-dots{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);display:flex;gap:.5rem;z-index:10}
+.slider-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.5);cursor:pointer;transition:all .3s;border:none}
+.slider-dot.active{background:white;width:24px;border-radius:4px}
+.detail-layout{display:grid;grid-template-columns:1fr 380px;gap:3rem;align-items:start;padding:3rem 0}
+.detail-main{}
+.detail-sidebar{position:sticky;top:100px}
+.detail-breadcrumb{display:flex;align-items:center;gap:.5rem;font-size:.8125rem;color:var(--text-muted);margin-bottom:1.25rem}
+.detail-breadcrumb a{color:var(--text-muted);transition:color .2s}
+.detail-breadcrumb a:hover{color:var(--terracotta)}
+.detail-category{display:inline-block;background:rgba(194,103,59,.1);color:var(--terracotta);padding:.3rem .875rem;border-radius:var(--radius-full);font-size:.8rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:1rem}
+.detail-title{font-family:var(--font-display);font-size:clamp(2rem,4vw,3rem);font-weight:400;line-height:1.15;color:var(--text-primary);margin-bottom:1.25rem}
+.detail-meta{display:flex;flex-wrap:wrap;gap:1.5rem;margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid rgba(14,12,10,.08)}
+.detail-meta-item{display:flex;align-items:center;gap:.5rem;font-size:.875rem;color:var(--text-secondary)}
+.detail-meta-item strong{color:var(--text-primary);font-weight:600}
+.detail-rating-big{display:flex;align-items:center;gap:.75rem;padding:1.25rem;background:linear-gradient(135deg,rgba(212,168,83,.08),rgba(194,103,59,.05));border-radius:var(--radius-md);border:1px solid rgba(212,168,83,.2);margin-bottom:2rem}
+.rating-big-num{font-family:var(--font-display);font-size:3rem;font-weight:600;color:var(--text-primary);line-height:1}
+.rating-big-stars{color:var(--saffron);font-size:1.25rem;letter-spacing:2px}
+.rating-big-label{font-size:.875rem;color:var(--text-muted);margin-top:.25rem}
+.section-block{margin-bottom:2rem}
+.section-block h3{font-family:var(--font-display);font-size:1.5rem;font-weight:600;color:var(--text-primary);margin-bottom:1rem}
+.detail-desc{font-size:1rem;line-height:1.8;color:var(--text-secondary)}
+.incl-grid{display:grid;grid-template-columns:1fr 1fr;gap:.625rem}
+.incl-item{display:flex;align-items:flex-start;gap:.625rem;font-size:.875rem;color:var(--text-secondary)}
+.incl-check{color:#4CAF50;flex-shrink:0;margin-top:.1rem}
+.excl-check{color:#e63946;flex-shrink:0;margin-top:.1rem}
+.highlights-list{display:flex;flex-wrap:wrap;gap:.625rem}
+.highlight-tag{background:var(--sand);color:var(--text-primary);padding:.5rem 1rem;border-radius:var(--radius-full);font-size:.875rem;font-weight:500}
+/* BOOKING CARD */
+.booking-card{background:white;border-radius:var(--radius-xl);box-shadow:0 4px 32px rgba(14,12,10,.12);border:1px solid rgba(212,168,83,.15);overflow:hidden}
+.booking-card-header{background:var(--charcoal);padding:1.75rem;position:relative;overflow:hidden}
+.booking-card-header::before{content:'';position:absolute;top:0;right:0;width:120px;height:120px;background:radial-gradient(circle,rgba(212,168,83,.15),transparent);border-radius:50%;transform:translate(30px,-30px)}
+.booking-price{font-family:var(--font-display);font-size:2.5rem;font-weight:600;color:white;line-height:1}
+.booking-price sup{font-size:1.375rem;font-weight:400;font-family:var(--font-body);vertical-align:super}
+.booking-price-label{font-size:.8rem;color:rgba(255,255,255,.5);margin-top:.25rem;text-transform:uppercase;letter-spacing:.8px}
+.booking-card-body{padding:1.75rem}
+.booking-card-body .form-group{margin-bottom:1rem}
+.booking-total{display:flex;align-items:center;justify-content:space-between;padding:1rem;background:var(--sand-light);border-radius:var(--radius-md);margin:1.25rem 0}
+.booking-total-label{font-size:.875rem;font-weight:600;color:var(--text-secondary)}
+.booking-total-amount{font-family:var(--font-display);font-size:1.625rem;font-weight:600;color:var(--text-primary)}
+.guarantee{display:flex;align-items:center;gap:.5rem;font-size:.78rem;color:var(--text-muted);margin-top:1rem;justify-content:center}
+/* REVIEWS */
+.review-card{padding:1.5rem 0;border-bottom:1px solid rgba(14,12,10,.06)}
+.review-card:last-child{border-bottom:none}
+.review-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.review-author{display:flex;align-items:center;gap:.75rem}
+.review-avatar{width:42px;height:42px;border-radius:50%;background:var(--sand);display:flex;align-items:center;justify-content:center;font-size:1.1rem;border:2px solid var(--gold);flex-shrink:0;overflow:hidden}
+.review-avatar img{width:100%;height:100%;object-fit:cover}
+.review-name{font-weight:600;font-size:.9rem}
+.review-date{font-size:.78rem;color:var(--text-muted)}
+.review-stars{color:var(--saffron);font-size:.875rem}
+.review-text{font-size:.9rem;line-height:1.7;color:var(--text-secondary)}
+/* SIMILAR */
+.similar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem}
+/* BOOKING CONFIRMATION */
+.booking-success{text-align:center;padding:2rem}
+.booking-success-icon{font-size:3.5rem;margin-bottom:1rem}
+.booking-success-title{font-family:var(--font-display);font-size:1.75rem;font-weight:600;margin-bottom:.75rem}
+.booking-success-text{color:var(--text-muted);line-height:1.6}
+@media(max-width:1024px){.detail-layout{grid-template-columns:1fr}.detail-sidebar{position:static}}
+@media(max-width:768px){.detail-hero{height:45vh}.incl-grid{grid-template-columns:1fr}.detail-meta{gap:1rem}}
+</style>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Sign In to Book</h2>
+      <button class="modal-close" id="authModalClose">✕</button>
+    </div>
+    <div style="margin-bottom:1rem">
+      <button class="google-btn" id="googleLoginBtn">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+    </div>
+    <div class="divider-text">or with email</div>
+    <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="loginEmail" placeholder="your@email.com"></div>
+    <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="loginPassword" placeholder="••••••••"><div class="form-error" id="loginError"></div></div>
+    <div class="form-group" style="margin-top:1.25rem"><button class="btn btn-gold" style="width:100%;justify-content:center" id="loginSubmitBtn">Sign In & Book</button></div>
+  </div>
+</div>
+
+<!-- BOOKING SUCCESS MODAL -->
+<div class="modal-overlay" id="bookingSuccessModal">
+  <div class="modal">
+    <div class="booking-success">
+      <div class="booking-success-icon">🎉</div>
+      <div class="booking-success-title">Booking Confirmed!</div>
+      <p class="booking-success-text">Your adventure is booked! Check your email for confirmation details. Our team will contact you within 24 hours.</p>
+      <div style="margin-top:2rem;display:flex;gap:1rem;justify-content:center">
+        <a href="tours.html" class="btn btn-dark btn-sm">Browse More</a>
+        <button class="btn btn-gold btn-sm" onclick="document.getElementById('bookingSuccessModal').classList.remove('open')">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar light" id="navbar">
+  <a href="../index.html" class="nav-logo">
+    <div class="logo-mark">K</div>
+    <span class="logo-text">Kech<span>.go</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="tours.html">Experiences</a></li>
+    <li><a href="tours.html?category=Cultural">Culture</a></li>
+    <li><a href="tours.html?category=Adventure">Adventure</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="nav-btn nav-btn-ghost" id="loginBtn">Sign In</button>
+    <button class="nav-btn nav-btn-primary" id="signupBtn">Get Started</button>
+    <div class="nav-user" id="navUser" style="display:none">
+      <div id="navAvatarCircle" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#D4A853,#C2673B);display:flex;align-items:center;justify-content:center;color:white;font-weight:600;font-size:.875rem;border:2px solid #D4A853"></div>
+      <span id="navUserName" style="font-size:.875rem;font-weight:500;color:var(--text-secondary)"></span>
+    </div>
+  </div>
+  <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- MAIN -->
+<main id="mainContent" style="padding-top:70px">
+  <!-- JS fills this -->
+  <div style="min-height:80vh;display:flex;align-items:center;justify-content:center">
+    <div style="text-align:center">
+      <div style="font-size:2rem;margin-bottom:1rem;animation:spin 1s linear infinite;display:inline-block">⏳</div>
+      <div style="color:var(--text-muted)">Loading experience...</div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom" style="padding-top:0;border-top:none">
+      <div class="footer-copy">© 2025 Kech.go</div>
+      <a href="tours.html" style="color:rgba(255,255,255,.4);font-size:.875rem">← All Experiences</a>
+    </div>
+  </div>
+</footer>
+
+<style>@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}</style>
+
+<script type="module">
+import { auth, onAuthStateChanged, loginWithGoogle, loginWithEmail } from "../js/firebase-config.js";
+import { getTourById, DEMO_TOURS, DEMO_REVIEWS, getTourReviews, createBooking, getTours } from "../js/tours-service.js";
+
+const params = new URLSearchParams(window.location.search);
+const tourId = params.get("id");
+let currentTour = null;
+let currentUser = null;
+let sliderIdx = 0;
+
+function showToast(msg, type="info") {
+  const c = document.getElementById("toastContainer");
+  const t = document.createElement("div");
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${type==="success"?"✅":type==="error"?"❌":"✨"}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.animation="toastOut .4s forwards"; setTimeout(()=>t.remove(),400); }, 3500);
+}
+
+window.addEventListener("scroll", () => document.getElementById("navbar").classList.toggle("scrolled", window.scrollY>60));
+
+// ── AUTH ──
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+  const lb = document.getElementById("loginBtn");
+  const sb = document.getElementById("signupBtn");
+  const nu = document.getElementById("navUser");
+  if (user) {
+    lb.style.display="none"; sb.style.display="none"; nu.style.display="flex";
+    document.getElementById("navAvatarCircle").textContent = (user.displayName||user.email||"U")[0].toUpperCase();
+    document.getElementById("navUserName").textContent = user.displayName||user.email.split("@")[0];
+    // pre-fill booking form
+    const bName = document.getElementById("bookingName");
+    const bEmail = document.getElementById("bookingEmail");
+    if (bName) bName.value = user.displayName||"";
+    if (bEmail) bEmail.value = user.email||"";
+  } else {
+    lb.style.display=""; sb.style.display=""; nu.style.display="none";
+  }
+});
+
+document.getElementById("loginBtn").addEventListener("click", () => document.getElementById("authModal").classList.add("open"));
+document.getElementById("signupBtn").addEventListener("click", () => document.getElementById("authModal").classList.add("open"));
+document.getElementById("authModalClose").addEventListener("click", () => document.getElementById("authModal").classList.remove("open"));
+document.getElementById("authModal").addEventListener("click", e => { if(e.target===document.getElementById("authModal")) document.getElementById("authModal").classList.remove("open"); });
+
+document.getElementById("googleLoginBtn").addEventListener("click", async () => {
+  try {
+    await loginWithGoogle();
+    document.getElementById("authModal").classList.remove("open");
+    showToast("Signed in! 🌟", "success");
+  } catch(e) { showToast("Login failed", "error"); }
+});
+
+document.getElementById("loginSubmitBtn").addEventListener("click", async () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const pass = document.getElementById("loginPassword").value;
+  if (!email||!pass) { document.getElementById("loginError").textContent="Fill all fields"; document.getElementById("loginError").classList.add("show"); return; }
+  try {
+    await loginWithEmail(email, pass);
+    document.getElementById("authModal").classList.remove("open");
+    showToast("Welcome back! ✨", "success");
+  } catch { document.getElementById("loginError").textContent="Invalid credentials"; document.getElementById("loginError").classList.add("show"); }
+});
+
+// ── LOAD TOUR ──
+async function loadTour() {
+  if (!tourId) { window.location.href = "tours.html"; return; }
+  try {
+    currentTour = await getTourById(tourId);
+    if (!currentTour) { window.location.href = "tours.html"; return; }
+    document.title = `${currentTour.title} — Kech.go`;
+    renderTour();
+    loadReviews();
+    loadSimilar();
+  } catch(e) {
+    document.getElementById("mainContent").innerHTML = `<div style="text-align:center;padding:5rem"><h2>Tour not found</h2><a href="tours.html" class="btn btn-gold" style="margin-top:1rem">Browse Tours</a></div>`;
+  }
+}
+
+function renderTour() {
+  const t = currentTour;
+  const images = Array.isArray(t.images) ? t.images : [t.images];
+  const stars = "★".repeat(Math.floor(t.rating||0)) + "☆".repeat(5-Math.floor(t.rating||0));
+
+  document.getElementById("mainContent").innerHTML = `
+    <!-- IMAGE SLIDER -->
+    <div class="detail-hero">
+      <div class="detail-hero-slider" id="heroSlider">
+        ${images.map(img => `<div class="detail-hero-slide"><img src="${img}" alt="${t.title}" loading="lazy"></div>`).join("")}
+      </div>
+      ${images.length > 1 ? `
+        <button class="slider-btn slider-prev" id="sliderPrev">‹</button>
+        <button class="slider-btn slider-next" id="sliderNext">›</button>
+        <div class="slider-dots" id="sliderDots">
+          ${images.map((_,i) => `<button class="slider-dot ${i===0?"active":""}" data-idx="${i}"></button>`).join("")}
+        </div>
+      ` : ""}
+    </div>
+
+    <div class="container">
+      <div class="detail-layout">
+        <!-- MAIN -->
+        <div class="detail-main">
+          <div class="detail-breadcrumb">
+            <a href="../index.html">Home</a> › <a href="tours.html">Experiences</a> › <span>${t.title}</span>
+          </div>
+          <span class="detail-category">${t.category}</span>
+          <h1 class="detail-title">${t.title}</h1>
+          <div class="detail-meta">
+            <div class="detail-meta-item">📍 <strong>${t.location}</strong></div>
+            <div class="detail-meta-item">🕐 <strong>${t.duration}</strong></div>
+            <div class="detail-meta-item">👥 Max <strong>${t.maxGroupSize||12}</strong> people</div>
+            <div class="detail-meta-item">🌍 ${(t.languages||["English"]).join(", ")}</div>
+          </div>
+          <div class="detail-rating-big">
+            <div>
+              <div class="rating-big-num">${(t.rating||0).toFixed(1)}</div>
+            </div>
+            <div>
+              <div class="rating-big-stars">${stars}</div>
+              <div class="rating-big-label">${t.reviewCount||0} verified reviews</div>
+            </div>
+          </div>
+
+          <div class="section-block">
+            <h3>About This Experience</h3>
+            <p class="detail-desc">${t.description}</p>
+          </div>
+
+          ${t.highlights && t.highlights.length ? `
+          <div class="section-block">
+            <h3>Highlights</h3>
+            <div class="highlights-list">${t.highlights.map(h=>`<span class="highlight-tag">✦ ${h}</span>`).join("")}</div>
+          </div>` : ""}
+
+          <div class="section-block">
+            <h3>What's Included</h3>
+            <div class="incl-grid">
+              ${(t.included||[]).map(i=>`<div class="incl-item"><span class="incl-check">✓</span>${i}</div>`).join("")}
+              ${(t.excluded||[]).map(i=>`<div class="incl-item"><span class="excl-check">✗</span>${i}</div>`).join("")}
+            </div>
+          </div>
+
+          <div class="section-block" id="reviewsSection">
+            <h3>Traveler Reviews</h3>
+            <div id="reviewsList"><div style="color:var(--text-muted);font-size:.9rem">Loading reviews...</div></div>
+          </div>
+        </div>
+
+        <!-- SIDEBAR / BOOKING CARD -->
+        <div class="detail-sidebar">
+          <div class="booking-card">
+            <div class="booking-card-header">
+              <div class="booking-price-label">Starting from</div>
+              <div class="booking-price"><sup>$</sup>${t.price}</div>
+              <div style="font-size:.82rem;color:rgba(255,255,255,.45);margin-top:.25rem">per person</div>
+            </div>
+            <div class="booking-card-body">
+              <div class="form-group">
+                <label class="form-label">Your Name</label>
+                <input type="text" class="form-input" id="bookingName" placeholder="Full name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-input" id="bookingEmail" placeholder="your@email.com">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone (optional)</label>
+                <input type="tel" class="form-input" id="bookingPhone" placeholder="+212 600 000 000">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-input" id="bookingDate" min="${new Date().toISOString().split("T")[0]}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Number of People</label>
+                <select class="form-input" id="bookingPeople">
+                  ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}">${n} ${n===1?"person":"people"}</option>`).join("")}
+                </select>
+              </div>
+              <div class="booking-total">
+                <div class="booking-total-label">Total Price</div>
+                <div class="booking-total-amount" id="bookingTotal">$${t.price}</div>
+              </div>
+              <div class="form-error" id="bookingError" style="margin-bottom:.75rem"></div>
+              <button class="btn btn-gold" style="width:100%;justify-content:center;font-size:1rem" id="bookNowBtn">
+                🏷️ Book Now
+              </button>
+              <div class="guarantee">🔒 Free cancellation · Secure payment</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIMILAR TOURS -->
+      <div style="padding-bottom:4rem">
+        <h2 class="section-title" style="margin-bottom:2rem">Similar <em>Experiences</em></h2>
+        <div class="similar-grid" id="similarGrid">
+          <div class="skel-card"><div class="skel-img skeleton" style="height:220px"></div><div style="padding:1.25rem"><div class="skeleton skel-line" style="height:14px;margin-bottom:.75rem"></div><div class="skeleton skel-line short" style="height:14px"></div></div></div>
+          <div class="skel-card"><div class="skel-img skeleton" style="height:220px"></div><div style="padding:1.25rem"><div class="skeleton skel-line" style="height:14px;margin-bottom:.75rem"></div><div class="skeleton skel-line short" style="height:14px"></div></div></div>
+          <div class="skel-card"><div class="skel-img skeleton" style="height:220px"></div><div style="padding:1.25rem"><div class="skeleton skel-line" style="height:14px;margin-bottom:.75rem"></div><div class="skeleton skel-line short" style="height:14px"></div></div></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Init slider
+  initSlider(images);
+
+  // Price calc
+  const peopleSelect = document.getElementById("bookingPeople");
+  peopleSelect.addEventListener("change", () => {
+    const total = t.price * parseInt(peopleSelect.value);
+    document.getElementById("bookingTotal").textContent = `$${total}`;
+  });
+
+  // Auth state prefill
+  if (currentUser) {
+    document.getElementById("bookingName").value = currentUser.displayName||"";
+    document.getElementById("bookingEmail").value = currentUser.email||"";
+  }
+
+  // Book button
+  document.getElementById("bookNowBtn").addEventListener("click", handleBooking);
+}
+
+function initSlider(images) {
+  if (images.length <= 1) return;
+  const slider = document.getElementById("heroSlider");
+  const dots = document.querySelectorAll(".slider-dot");
+
+  function goTo(idx) {
+    sliderIdx = Math.max(0, Math.min(idx, images.length-1));
+    slider.style.transform = `translateX(-${sliderIdx * 100}%)`;
+    dots.forEach((d,i) => d.classList.toggle("active", i===sliderIdx));
+  }
+
+  document.getElementById("sliderPrev").addEventListener("click", () => goTo(sliderIdx-1));
+  document.getElementById("sliderNext").addEventListener("click", () => goTo(sliderIdx+1));
+  dots.forEach(d => d.addEventListener("click", () => goTo(parseInt(d.dataset.idx))));
+}
+
+async function handleBooking() {
+  if (!currentUser) { document.getElementById("authModal").classList.add("open"); showToast("Please sign in to book", "info"); return; }
+  const name = document.getElementById("bookingName").value.trim();
+  const email = document.getElementById("bookingEmail").value.trim();
+  const date = document.getElementById("bookingDate").value;
+  const people = parseInt(document.getElementById("bookingPeople").value);
+  const errEl = document.getElementById("bookingError");
+  errEl.classList.remove("show"); errEl.textContent="";
+
+  if (!name) { errEl.textContent="Please enter your name"; errEl.classList.add("show"); return; }
+  if (!email||!email.includes("@")) { errEl.textContent="Please enter a valid email"; errEl.classList.add("show"); return; }
+  if (!date) { errEl.textContent="Please select a date"; errEl.classList.add("show"); return; }
+
+  const btn = document.getElementById("bookNowBtn");
+  btn.textContent = "⏳ Processing..."; btn.disabled = true;
+
+  try {
+    await createBooking({
+      tourId: currentTour.id,
+      tourTitle: currentTour.title,
+      tourImage: Array.isArray(currentTour.images) ? currentTour.images[0] : currentTour.images,
+      userId: currentUser.uid,
+      name, email,
+      phone: document.getElementById("bookingPhone").value,
+      people, date,
+      totalPrice: currentTour.price * people,
+      currency: "USD"
+    });
+    document.getElementById("bookingSuccessModal").classList.add("open");
+  } catch(e) {
+    errEl.textContent = "Booking failed. Please try again.";
+    errEl.classList.add("show");
+    showToast("Booking failed. Try again.", "error");
+  } finally {
+    btn.textContent = "🏷️ Book Now"; btn.disabled = false;
+  }
+}
+
+async function loadReviews() {
+  const container = document.getElementById("reviewsList");
+  if (!container) return;
+  try {
+    const reviews = await getTourReviews(tourId);
+    if (reviews.length === 0) { container.innerHTML = `<p style="color:var(--text-muted);font-size:.9rem">No reviews yet. Be the first!</p>`; return; }
+    container.innerHTML = reviews.map(r => `
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-author">
+            <div class="review-avatar">${(r.userName||"U")[0].toUpperCase()}</div>
+            <div>
+              <div class="review-name">${r.userName||"Anonymous"}</div>
+              <div class="review-date">${r.createdAt ? new Date(r.createdAt.seconds ? r.createdAt.seconds*1000 : r.createdAt).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"}) : ""}</div>
+            </div>
+          </div>
+          <div class="review-stars">${"★".repeat(r.rating||5)}</div>
+        </div>
+        <p class="review-text">${r.comment}</p>
+      </div>
+    `).join("");
+  } catch { container.innerHTML = `<p style="color:var(--text-muted)">Reviews unavailable.</p>`; }
+}
+
+async function loadSimilar() {
+  const grid = document.getElementById("similarGrid");
+  if (!grid) return;
+  try {
+    const all = await getTours();
+    const similar = all.filter(t => t.id !== tourId && t.category === currentTour?.category).slice(0,3);
+    if (similar.length === 0) { grid.innerHTML=""; return; }
+    grid.innerHTML = similar.map(tour => {
+      const img = Array.isArray(tour.images) ? tour.images[0] : tour.images;
+      const stars = "★".repeat(Math.floor(tour.rating||0)) + "☆".repeat(5-Math.floor(tour.rating||0));
+      return `
+        <div class="tour-card" onclick="window.location.href='tour-detail.html?id=${tour.id}'">
+          <div class="tc-img" style="height:220px"><img src="${img}" alt="${tour.title}" loading="lazy"><div class="tc-overlay"></div></div>
+          <div class="tc-body">
+            <div class="tc-meta"><div class="tc-rating"><span class="stars">${stars}</span>${(tour.rating||0).toFixed(1)}</div><span class="tc-duration">🕐 ${tour.duration}</span></div>
+            <h3 class="tc-title">${tour.title}</h3>
+            <div class="tc-footer"><div><div class="price-amount"><sup>$</sup>${tour.price}</div></div><button class="book-btn">View</button></div>
+          </div>
+        </div>`;
+    }).join("");
+  } catch { grid.innerHTML=""; }
+}
+
+loadTour();
+</script>
+</body>
+</html>

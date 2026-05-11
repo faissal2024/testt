@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Kech.go — Discover Extraordinary Morocco</title>
+<meta name="description" content="Book unforgettable tours and experiences in Marrakech and Morocco. Desert adventures, medina walks, cooking classes and more.">
+<link rel="stylesheet" href="css/main.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23D4A853'/><text y='.9em' font-size='70' x='15'>K</text></svg>">
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-logo">Kech<span>.go</span></div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <div class="loading-text">Preparing your journey</div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="mobile-menu-hdr">
+    <div class="nav-logo">
+      <div class="logo-mark">K</div>
+      <span class="logo-text">Kech<span>.go</span></span>
+    </div>
+    <button class="mobile-close" id="mobileClose">✕</button>
+  </div>
+  <ul class="mobile-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="pages/tours.html">Experiences</a></li>
+    <li><a href="pages/tours.html?category=Cultural">Culture</a></li>
+    <li><a href="pages/tours.html?category=Adventure">Adventure</a></li>
+    <li><a href="pages/tours.html?category=Food+%26+Drink">Food</a></li>
+  </ul>
+  <div class="mobile-actions">
+    <button class="btn btn-gold" id="mobileLoginBtn">Sign In</button>
+    <button class="btn btn-outline" id="mobileSignupBtn">Create Account</button>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="authModalTitle">Welcome Back</h2>
+      <button class="modal-close" id="authModalClose">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="login">Sign In</button>
+      <button class="modal-tab" data-tab="signup">Create Account</button>
+    </div>
+    <!-- Login -->
+    <div class="tab-panel active" id="loginPanel">
+      <button class="google-btn" id="googleLoginBtn">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+      <div class="divider-text">or sign in with email</div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="loginEmail" placeholder="your@email.com">
+        <div class="form-error" id="loginEmailError"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="loginPassword" placeholder="••••••••">
+        <div class="form-error" id="loginPassError"></div>
+      </div>
+      <div class="form-group" style="margin-top:1.5rem">
+        <button class="btn btn-gold" style="width:100%;justify-content:center" id="loginSubmitBtn">Sign In</button>
+      </div>
+    </div>
+    <!-- Signup -->
+    <div class="tab-panel" id="signupPanel">
+      <button class="google-btn" id="googleSignupBtn">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+        Sign up with Google
+      </button>
+      <div class="divider-text">or create with email</div>
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-input" id="signupName" placeholder="Your name">
+        <div class="form-error" id="signupNameError"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="signupEmail" placeholder="your@email.com">
+        <div class="form-error" id="signupEmailError"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="signupPassword" placeholder="Min. 6 characters">
+        <div class="form-error" id="signupPassError"></div>
+      </div>
+      <div class="form-group" style="margin-top:1.5rem">
+        <button class="btn btn-gold" style="width:100%;justify-content:center" id="signupSubmitBtn">Create Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark">K</div>
+    <span class="logo-text">Kech<span>.go</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="pages/tours.html">Experiences</a></li>
+    <li><a href="pages/tours.html?category=Cultural">Culture</a></li>
+    <li><a href="pages/tours.html?category=Adventure">Adventure</a></li>
+    <li><a href="pages/tours.html?category=Food+%26+Drink">Food & Drink</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="nav-btn nav-btn-ghost" id="loginBtn">Sign In</button>
+    <button class="nav-btn nav-btn-primary" id="signupBtn">Get Started</button>
+    <div class="nav-user" id="navUser" style="display:none">
+      <div class="nav-avatar" id="navAvatarCircle" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#D4A853,#C2673B);display:flex;align-items:center;justify-content:center;color:white;font-weight:600;border:2px solid #D4A853;font-size:.875rem" id="navAvatarLetter"></div>
+      <span id="navUserName" style="font-size:.875rem;color:rgba(255,255,255,.85);font-weight:500"></span>
+    </div>
+  </div>
+  <button class="nav-toggle" id="navToggle" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <img src="https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=1600&q=85" alt="Marrakech Medina" class="hero-img" loading="eager">
+    <div class="hero-overlay"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      Morocco's #1 Experience Platform
+    </div>
+    <h1 class="hero-title">
+      Discover <em>Magical</em><br>Morocco
+    </h1>
+    <p class="hero-sub">Handpicked tours, authentic experiences, and unforgettable adventures — from the ancient medinas to the endless Sahara.</p>
+    <!-- SEARCH BAR -->
+    <div class="hero-search">
+      <div class="search-group">
+        <span class="si">🔍</span>
+        <div>
+          <label>Search</label>
+          <input type="text" placeholder="Tours, activities, experiences..." id="heroSearch">
+        </div>
+      </div>
+      <div class="search-divider"></div>
+      <div class="search-group">
+        <span class="si">🗺️</span>
+        <div>
+          <label>Destination</label>
+          <select id="heroDestination">
+            <option value="">All Morocco</option>
+            <option>Marrakech</option>
+            <option>Sahara Desert</option>
+            <option>Atlas Mountains</option>
+            <option>Essaouira</option>
+            <option>Fes</option>
+            <option>Chefchaouen</option>
+          </select>
+        </div>
+      </div>
+      <button class="search-btn" id="heroSearchBtn">
+        <span>Explore</span> →
+      </button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="hero-stat-num">500+</div><div class="hero-stat-label">Unique Experiences</div></div>
+      <div><div class="hero-stat-num">12K+</div><div class="hero-stat-label">Happy Travelers</div></div>
+      <div><div class="hero-stat-num">4.9★</div><div class="hero-stat-label">Average Rating</div></div>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section bg-sand" id="categoriesSection">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="eyebrow">Explore by Type</div>
+      <h2 class="section-title">Find Your <em>Perfect</em> Adventure</h2>
+      <p class="section-sub">From ancient medinas to star-lit deserts — every taste, every traveler.</p>
+    </div>
+    <div class="cats-grid" id="categoriesGrid">
+      <!-- Skeleton loaders -->
+      <div class="cat-card skeleton" style="height:190px"></div>
+      <div class="cat-card skeleton" style="height:190px"></div>
+      <div class="cat-card skeleton" style="height:190px"></div>
+      <div class="cat-card skeleton" style="height:190px"></div>
+      <div class="cat-card skeleton" style="height:190px"></div>
+      <div class="cat-card skeleton" style="height:190px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED TOURS -->
+<section class="section" id="featuredSection">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="eyebrow">Handpicked For You</div>
+      <h2 class="section-title">Featured <em>Experiences</em></h2>
+      <p class="section-sub">Our most loved tours, chosen by travelers just like you.</p>
+    </div>
+    <div class="tours-grid" id="featuredToursGrid">
+      <div class="skel-card skeleton"><div class="skel-img skeleton"></div><div class="skel-body"><div class="skel-line skeleton med"></div><div class="skel-line skeleton"></div><div class="skel-line skeleton short"></div></div></div>
+      <div class="skel-card skeleton"><div class="skel-img skeleton"></div><div class="skel-body"><div class="skel-line skeleton med"></div><div class="skel-line skeleton"></div><div class="skel-line skeleton short"></div></div></div>
+      <div class="skel-card skeleton"><div class="skel-img skeleton"></div><div class="skel-body"><div class="skel-line skeleton med"></div><div class="skel-line skeleton"></div><div class="skel-line skeleton short"></div></div></div>
+    </div>
+    <div style="text-align:center;margin-top:2.5rem">
+      <a href="pages/tours.html" class="btn btn-dark">View All Experiences →</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <div class="stat-num" data-target="500">0</div>
+        <div class="stat-lbl">Unique Experiences</div>
+      </div>
+      <div class="stat-item reveal reveal-d1">
+        <div class="stat-num" data-target="12000">0</div>
+        <div class="stat-lbl">Happy Travelers</div>
+      </div>
+      <div class="stat-item reveal reveal-d2">
+        <div class="stat-num" data-target="98">0</div>
+        <div class="stat-lbl">% Satisfaction Rate</div>
+      </div>
+      <div class="stat-item reveal reveal-d3">
+        <div class="stat-num" data-target="15">0</div>
+        <div class="stat-lbl">Years of Experience</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section bg-sand">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="eyebrow">What Travelers Say</div>
+      <h2 class="section-title">Stories of <em>Wonder</em></h2>
+      <p class="section-sub">Real reviews from real adventurers who discovered Morocco with us.</p>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The medina walking tour was the highlight of our entire Morocco trip. Ahmed knew every hidden courtyard, every story behind every door. We felt like we truly understood Marrakech."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">👩</div>
+          <div><div class="testi-name">Sarah Mitchell</div><div class="testi-origin">London, UK</div></div>
+        </div>
+      </div>
+      <div class="testi-card reveal reveal-d1">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Sleeping under the Sahara stars was something I'll never forget. The camp was luxurious, the food incredible, and watching the sunrise from the dunes brought me to tears. Pure magic."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">👨</div>
+          <div><div class="testi-name">James & Emma Carter</div><div class="testi-origin">New York, USA</div></div>
+        </div>
+      </div>
+      <div class="testi-card reveal reveal-d2">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The cooking class was worth every dirham. Chef Fatima taught us secrets that took her family generations to perfect. I've made tagine every week since returning home!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar">👩</div>
+          <div><div class="testi-name">Yuki Tanaka</div><div class="testi-origin">Tokyo, Japan</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-bg"></div>
+  <div class="container">
+    <div class="cta-content reveal">
+      <h2 class="cta-title">Your <em>Morocco Story</em><br>Starts Here</h2>
+      <p class="cta-sub">Join thousands of travelers who've discovered the magic of Morocco through our curated experiences.</p>
+      <div class="cta-btns">
+        <a href="pages/tours.html" class="btn btn-gold">Browse Experiences</a>
+        <button class="btn btn-outline" id="ctaSignupBtn">Create Free Account</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="nav-logo">
+          <div class="logo-mark">K</div>
+          <span class="logo-text" style="color:white">Kech<span>.go</span></span>
+        </div>
+        <p class="footer-desc">The premier marketplace for authentic Moroccan tours and experiences. Discover ancient medinas, vast deserts, and timeless traditions.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Experiences</div>
+        <ul class="footer-links">
+          <li><a href="pages/tours.html?category=Cultural">Cultural Tours</a></li>
+          <li><a href="pages/tours.html?category=Adventure">Adventure</a></li>
+          <li><a href="pages/tours.html?category=Food+%26+Drink">Food & Drink</a></li>
+          <li><a href="pages/tours.html?category=Wellness">Wellness & Spa</a></li>
+          <li><a href="pages/tours.html?category=Day+Trips">Day Trips</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Destinations</div>
+        <ul class="footer-links">
+          <li><a href="pages/tours.html">Marrakech</a></li>
+          <li><a href="pages/tours.html">Sahara Desert</a></li>
+          <li><a href="pages/tours.html">Atlas Mountains</a></li>
+          <li><a href="pages/tours.html">Essaouira</a></li>
+          <li><a href="pages/tours.html">Fes & Meknes</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <ul class="footer-links">
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">How It Works</a></li>
+          <li><a href="#">For Guides</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 Kech.go — All rights reserved. Made with ❤️ in Marrakech.</div>
+      <div class="footer-social">
+        <a href="#" class="social-link" aria-label="Instagram">📸</a>
+        <a href="#" class="social-link" aria-label="Facebook">👤</a>
+        <a href="#" class="social-link" aria-label="Twitter">🐦</a>
+        <a href="#" class="social-link" aria-label="TikTok">🎵</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script type="module">
+import { auth, onAuthStateChanged, loginWithGoogle, loginWithEmail, signUpWithEmail, logout, isAdmin } from "./js/firebase-config.js";
+import { getTours, DEMO_TOURS, DEMO_CATEGORIES, renderStars } from "./js/tours-service.js";
+
+// ── LOADING ──
+window.addEventListener("load", () => {
+  setTimeout(() => { document.getElementById("loadingScreen").classList.add("hidden"); }, 1800);
+});
+
+// ── TOAST ──
+function showToast(msg, type = "info") {
+  const c = document.getElementById("toastContainer");
+  const t = document.createElement("div");
+  t.className = `toast ${type}`;
+  const icons = { success: "✅", error: "❌", info: "✨" };
+  t.innerHTML = `<span>${icons[type] || "ℹ️"}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.animation = "toastOut .4s forwards"; setTimeout(() => t.remove(), 400); }, 3500);
+}
+
+// ── NAVBAR SCROLL ──
+window.addEventListener("scroll", () => {
+  const nb = document.getElementById("navbar");
+  nb.classList.toggle("scrolled", window.scrollY > 60);
+});
+
+// ── MOBILE MENU ──
+document.getElementById("navToggle").addEventListener("click", () => document.getElementById("mobileMenu").classList.add("open"));
+document.getElementById("mobileClose").addEventListener("click", () => document.getElementById("mobileMenu").classList.remove("open"));
+
+// ── AUTH MODAL ──
+function openAuthModal(tab = "login") {
+  const modal = document.getElementById("authModal");
+  modal.classList.add("open");
+  document.querySelectorAll(".modal-tab").forEach(t => t.classList.toggle("active", t.dataset.tab === tab));
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === tab + "Panel"));
+  document.getElementById("authModalTitle").textContent = tab === "login" ? "Welcome Back" : "Join Kech.go";
+}
+
+document.getElementById("loginBtn").addEventListener("click", () => openAuthModal("login"));
+document.getElementById("signupBtn").addEventListener("click", () => openAuthModal("signup"));
+document.getElementById("ctaSignupBtn").addEventListener("click", () => openAuthModal("signup"));
+document.getElementById("mobileLoginBtn").addEventListener("click", () => { document.getElementById("mobileMenu").classList.remove("open"); openAuthModal("login"); });
+document.getElementById("mobileSignupBtn").addEventListener("click", () => { document.getElementById("mobileMenu").classList.remove("open"); openAuthModal("signup"); });
+document.getElementById("authModalClose").addEventListener("click", () => document.getElementById("authModal").classList.remove("open"));
+document.getElementById("authModal").addEventListener("click", e => { if (e.target === document.getElementById("authModal")) document.getElementById("authModal").classList.remove("open"); });
+
+document.querySelectorAll(".modal-tab").forEach(tab => {
+  tab.addEventListener("click", () => openAuthModal(tab.dataset.tab));
+});
+
+// ── GOOGLE LOGIN ──
+async function handleGoogleAuth() {
+  try {
+    const user = await loginWithGoogle();
+    document.getElementById("authModal").classList.remove("open");
+    showToast(`Welcome, ${user.displayName || "Traveler"}! 🌟`, "success");
+    const admin = await isAdmin(user);
+    if (admin) { setTimeout(() => { if (confirm("You have admin access! Go to dashboard?")) window.location.href = "admin/index.html"; }, 500); }
+  } catch (e) { showToast(e.message.replace("Firebase: ", ""), "error"); }
+}
+document.getElementById("googleLoginBtn").addEventListener("click", handleGoogleAuth);
+document.getElementById("googleSignupBtn").addEventListener("click", handleGoogleAuth);
+
+// ── EMAIL LOGIN ──
+document.getElementById("loginSubmitBtn").addEventListener("click", async () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const pass = document.getElementById("loginPassword").value;
+  let valid = true;
+  ["loginEmailError", "loginPassError"].forEach(id => { const el = document.getElementById(id); el.classList.remove("show"); el.textContent = ""; });
+  if (!email) { showFieldError("loginEmailError", "Email is required"); valid = false; }
+  if (!pass) { showFieldError("loginPassError", "Password is required"); valid = false; }
+  if (!valid) return;
+  try {
+    const btn = document.getElementById("loginSubmitBtn");
+    btn.textContent = "Signing in..."; btn.disabled = true;
+    const user = await loginWithEmail(email, pass);
+    document.getElementById("authModal").classList.remove("open");
+    showToast(`Welcome back, ${user.displayName || "Traveler"}! ✨`, "success");
+    const admin = await isAdmin(user);
+    if (admin) { setTimeout(() => { if (confirm("Admin access detected! Go to dashboard?")) window.location.href = "admin/index.html"; }, 500); }
+  } catch (e) {
+    showFieldError("loginPassError", "Invalid email or password");
+  } finally {
+    const btn = document.getElementById("loginSubmitBtn");
+    btn.textContent = "Sign In"; btn.disabled = false;
+  }
+});
+
+// ── EMAIL SIGNUP ──
+document.getElementById("signupSubmitBtn").addEventListener("click", async () => {
+  const name = document.getElementById("signupName").value.trim();
+  const email = document.getElementById("signupEmail").value.trim();
+  const pass = document.getElementById("signupPassword").value;
+  let valid = true;
+  ["signupNameError", "signupEmailError", "signupPassError"].forEach(id => { const el = document.getElementById(id); el.classList.remove("show"); el.textContent = ""; });
+  if (!name) { showFieldError("signupNameError", "Name is required"); valid = false; }
+  if (!email || !email.includes("@")) { showFieldError("signupEmailError", "Valid email required"); valid = false; }
+  if (pass.length < 6) { showFieldError("signupPassError", "Min. 6 characters"); valid = false; }
+  if (!valid) return;
+  try {
+    const btn = document.getElementById("signupSubmitBtn");
+    btn.textContent = "Creating..."; btn.disabled = true;
+    await signUpWithEmail(name, email, pass);
+    document.getElementById("authModal").classList.remove("open");
+    showToast(`Account created! Welcome to Kech.go 🎉`, "success");
+  } catch (e) {
+    showFieldError("signupEmailError", e.code === "auth/email-already-in-use" ? "Email already registered" : e.message);
+  } finally {
+    const btn = document.getElementById("signupSubmitBtn");
+    btn.textContent = "Create Account"; btn.disabled = false;
+  }
+});
+
+function showFieldError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.add("show");
+}
+
+// ── AUTH STATE ──
+onAuthStateChanged(auth, user => {
+  const loginBtn = document.getElementById("loginBtn");
+  const signupBtn = document.getElementById("signupBtn");
+  const navUser = document.getElementById("navUser");
+  if (user) {
+    loginBtn.style.display = "none";
+    signupBtn.style.display = "none";
+    navUser.style.display = "flex";
+    const letter = (user.displayName || user.email || "U")[0].toUpperCase();
+    document.getElementById("navAvatarCircle").textContent = letter;
+    document.getElementById("navUserName").textContent = user.displayName || user.email.split("@")[0];
+  } else {
+    loginBtn.style.display = "";
+    signupBtn.style.display = "";
+    navUser.style.display = "none";
+  }
+});
+
+// ── HERO SEARCH ──
+document.getElementById("heroSearchBtn").addEventListener("click", () => {
+  const q = document.getElementById("heroSearch").value.trim();
+  const dest = document.getElementById("heroDestination").value;
+  let url = "pages/tours.html?";
+  if (q) url += `q=${encodeURIComponent(q)}&`;
+  if (dest) url += `dest=${encodeURIComponent(dest)}`;
+  window.location.href = url;
+});
+document.getElementById("heroSearch").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("heroSearchBtn").click();
+});
+
+// ── LOAD CATEGORIES ──
+function loadCategories() {
+  const grid = document.getElementById("categoriesGrid");
+  grid.innerHTML = DEMO_CATEGORIES.map(cat => `
+    <div class="cat-card reveal" onclick="window.location.href='pages/tours.html?category=${encodeURIComponent(cat.name)}'">
+      <img src="${cat.image}" alt="${cat.name}" loading="lazy">
+      <div class="cat-overlay"></div>
+      <div class="cat-content">
+        <div class="cat-icon">${cat.icon}</div>
+        <div class="cat-name">${cat.name}</div>
+        <div class="cat-count">${cat.count} experiences</div>
+      </div>
+    </div>
+  `).join("");
+  initReveal();
+}
+
+// ── LOAD FEATURED TOURS ──
+async function loadFeaturedTours() {
+  const grid = document.getElementById("featuredToursGrid");
+  try {
+    const tours = await getTours();
+    const featured = tours.filter(t => t.featured !== false).slice(0, 3);
+    grid.innerHTML = featured.map(tour => renderTourCard(tour)).join("");
+    grid.querySelectorAll(".wishlist-btn").forEach(btn => {
+      btn.addEventListener("click", e => { e.stopPropagation(); handleWishlist(btn); });
+    });
+  } catch { grid.innerHTML = "<p style='text-align:center;color:var(--text-muted);padding:3rem'>Unable to load tours. Please refresh.</p>"; }
+}
+
+function renderTourCard(tour) {
+  const img = Array.isArray(tour.images) ? tour.images[0] : tour.images;
+  const stars = "★".repeat(Math.floor(tour.rating || 0)) + "☆".repeat(5 - Math.floor(tour.rating || 0));
+  return `
+    <div class="tour-card reveal" onclick="window.location.href='pages/tour-detail.html?id=${tour.id}'">
+      <div class="tc-img">
+        <img src="${img}" alt="${tour.title}" loading="lazy">
+        <div class="tc-overlay"></div>
+        <div class="tc-badges">
+          <span class="badge badge-cat">${tour.category || "Tour"}</span>
+          ${tour.featured ? '<span class="badge badge-feat">Featured</span>' : ""}
+        </div>
+        <button class="wishlist-btn" data-id="${tour.id}" aria-label="Add to wishlist">🤍</button>
+      </div>
+      <div class="tc-body">
+        <div class="tc-meta">
+          <div class="tc-rating"><span class="stars">${stars}</span>${(tour.rating || 0).toFixed(1)}</div>
+          <span class="tc-reviews">(${tour.reviewCount || 0})</span>
+          <span class="tc-duration">🕐 ${tour.duration}</span>
+        </div>
+        <h3 class="tc-title">${tour.title}</h3>
+        <div class="tc-location">📍 ${tour.location}</div>
+        <div class="tc-footer">
+          <div>
+            <div class="price-label">From</div>
+            <div class="price-amount"><sup>$</sup>${tour.price}</div>
+            <div class="price-per">per person</div>
+          </div>
+          <button class="book-btn">Book Now</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function handleWishlist(btn) {
+  if (!auth.currentUser) { openAuthModal("login"); showToast("Please sign in to save favorites", "info"); return; }
+  btn.classList.toggle("active");
+  btn.textContent = btn.classList.contains("active") ? "❤️" : "🤍";
+  showToast(btn.classList.contains("active") ? "Added to wishlist ❤️" : "Removed from wishlist", "info");
+}
+
+// ── COUNTER ANIMATION ──
+function animateCounters() {
+  document.querySelectorAll(".stat-num[data-target]").forEach(el => {
+    const target = parseInt(el.dataset.target);
+    const duration = 2000;
+    const step = target / (duration / 16);
+    let current = 0;
+    const timer = setInterval(() => {
+      current = Math.min(current + step, target);
+      el.textContent = target >= 1000 ? (current / 1000).toFixed(1) + "K+" : Math.floor(current) + (target === 98 ? "%" : "+");
+      if (current >= target) clearInterval(timer);
+    }, 16);
+  });
+}
+
+// ── SCROLL REVEAL ──
+function initReveal() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add("visible"); if (e.target.closest(".stats-section")) animateCounters(); }
+    });
+  }, { threshold: 0.1, rootMargin: "0px 0px -60px 0px" });
+  document.querySelectorAll(".reveal").forEach(el => obs.observe(el));
+}
+
+// ── INIT ──
+loadCategories();
+loadFeaturedTours();
+initReveal();
+</script>
+</body>
+</html>

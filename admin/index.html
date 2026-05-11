@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Dashboard — Kech.go</title>
+<link rel="stylesheet" href="../css/admin.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23D4A853'/><text y='.9em' font-size='70' x='15'>K</text></svg>">
+</head>
+<body>
+
+<!-- AUTH GUARD SCREEN -->
+<div id="authGuard" style="position:fixed;inset:0;background:#0E0C0A;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem">
+  <div style="font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:white;letter-spacing:3px">Kech<span style="color:#D4A853">.go</span></div>
+  <div style="font-size:.875rem;color:rgba(255,255,255,.4);letter-spacing:1px">Verifying admin access...</div>
+  <div style="width:160px;height:2px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden">
+    <div style="height:100%;background:linear-gradient(135deg,#D4A853,#C2673B);animation:loadBar 1.5s ease-out forwards"></div>
+  </div>
+  <style>@keyframes loadBar{from{width:0}to{width:100%}}@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Outfit:wght@400;500;600&display=swap');</style>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="confirm-modal">
+    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+    <p class="confirm-text" id="confirmText">This action cannot be undone.</p>
+    <div class="confirm-btns">
+      <button class="btn btn-ghost btn-sm" id="confirmCancel">Cancel</button>
+      <button class="btn btn-danger btn-sm" id="confirmOk">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOUR DRAWER -->
+<div class="drawer-overlay" id="tourDrawer">
+  <div class="drawer">
+    <div class="drawer-header">
+      <h2 class="drawer-title" id="drawerTitle">Add New Tour</h2>
+      <button class="drawer-close" id="drawerClose">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="admin-form">
+        <input type="hidden" id="editTourId">
+        <div class="form-section">
+          <div class="form-section-title">Basic Info</div>
+          <div class="form-group"><label class="form-label">Tour Title *</label><input type="text" class="form-input" id="fTitle" placeholder="e.g. Medina Magic Walking Tour"></div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Category *</label>
+              <select class="form-input" id="fCategory">
+                <option value="">Select category</option>
+                <option>Cultural</option><option>Adventure</option><option>Food &amp; Drink</option>
+                <option>Wellness</option><option>Hiking</option><option>Day Trips</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Location *</label><input type="text" class="form-input" id="fLocation" placeholder="e.g. Marrakech Medina"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Short Description *</label><input type="text" class="form-input" id="fShortDesc" placeholder="One-line summary (max 120 chars)"></div>
+          <div class="form-group"><label class="form-label">Full Description *</label><textarea class="form-input" id="fDescription" rows="5" placeholder="Detailed tour description..."></textarea></div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Pricing & Details</div>
+          <div class="form-grid-3">
+            <div class="form-group"><label class="form-label">Price (USD) *</label><input type="number" class="form-input" id="fPrice" placeholder="45" min="1"></div>
+            <div class="form-group"><label class="form-label">Duration *</label><input type="text" class="form-input" id="fDuration" placeholder="e.g. 3 hours"></div>
+            <div class="form-group"><label class="form-label">Max Group Size</label><input type="number" class="form-input" id="fGroupSize" placeholder="12" min="1"></div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Languages</label><input type="text" class="form-input" id="fLanguages" placeholder="English, French, Arabic"></div>
+            <div class="form-group"><label class="form-label">Status</label>
+              <select class="form-input" id="fStatus">
+                <option value="true">Available</option>
+                <option value="false">Unavailable</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;gap:.75rem">
+            <input type="checkbox" id="fFeatured" style="width:18px;height:18px;accent-color:#D4A853">
+            <label for="fFeatured" class="form-label" style="margin:0;text-transform:none;font-size:.9rem">Mark as Featured</label>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Images (Paste URLs)</div>
+          <div class="form-group">
+            <label class="form-label">Image URL 1 *</label>
+            <input type="url" class="form-input" id="fImg1" placeholder="https://images.unsplash.com/...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Image URL 2</label>
+            <input type="url" class="form-input" id="fImg2" placeholder="https://images.unsplash.com/...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Image URL 3</label>
+            <input type="url" class="form-input" id="fImg3" placeholder="https://images.unsplash.com/...">
+          </div>
+          <div id="imgPreviews" class="img-url-preview"></div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Included / Excluded</div>
+          <div class="form-group">
+            <label class="form-label">What's Included (comma-separated)</label>
+            <textarea class="form-input" id="fIncluded" rows="3" placeholder="Expert guide, Entrance fees, Mint tea..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">What's Excluded</label>
+            <textarea class="form-input" id="fExcluded" rows="3" placeholder="Hotel pickup, Gratuities..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Highlights</label>
+            <textarea class="form-input" id="fHighlights" rows="3" placeholder="Djemaa el-Fna, Bahia Palace..."></textarea>
+          </div>
+        </div>
+        <div class="form-error" id="drawerError" style="margin-bottom:.75rem"></div>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn-ghost" id="drawerCancelBtn">Cancel</button>
+      <button class="btn btn-gold" id="drawerSaveBtn">Save Tour</button>
+    </div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-mark">K</div>
+      <div>
+        <div class="sidebar-logo-text">Kech<span>.go</span></div>
+        <div class="sidebar-logo-badge">Admin Panel</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Main</div>
+        <button class="sidebar-link active" data-page="dashboard">
+          <span class="slink-icon">📊</span> Dashboard
+        </button>
+        <button class="sidebar-link" data-page="tours">
+          <span class="slink-icon">🗺️</span> Tours
+          <span class="slink-badge" id="toursBadge">—</span>
+        </button>
+        <button class="sidebar-link" data-page="bookings">
+          <span class="slink-icon">📅</span> Bookings
+          <span class="slink-badge" id="bookingsBadge">—</span>
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Management</div>
+        <button class="sidebar-link" data-page="users">
+          <span class="slink-icon">👥</span> Users
+        </button>
+        <button class="sidebar-link" data-page="reviews">
+          <span class="slink-icon">⭐</span> Reviews
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Site</div>
+        <a href="../index.html" target="_blank" class="sidebar-link">
+          <span class="slink-icon">🌐</span> View Website
+        </a>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar" id="sidebarAvatar">👤</div>
+        <div>
+          <div class="sidebar-user-name" id="sidebarUserName">Loading...</div>
+          <div class="sidebar-user-role">Administrator</div>
+        </div>
+        <button class="sidebar-logout" id="logoutBtn" title="Sign out">⏻</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="admin-main">
+    <!-- TOPBAR -->
+    <div class="admin-topbar">
+      <div class="topbar-left">
+        <button class="topbar-btn topbar-btn-ghost" id="sidebarToggle" style="display:none">☰</button>
+        <div>
+          <div class="topbar-page-title" id="topbarTitle">Dashboard</div>
+          <div class="topbar-breadcrumb">Kech.go Admin</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-btn topbar-btn-primary" id="topbarAddTourBtn">+ Add Tour</button>
+        <button class="notification-btn" title="Notifications">
+          🔔 <span class="notif-dot"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- PAGE CONTENT -->
+    <div class="admin-content" id="adminContent">
+      <div class="page-loading">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { auth, onAuthStateChanged, logout, isAdmin } from "../js/firebase-config.js";
+import {
+  getAllToursAdmin, addTour, updateTour, deleteTour, DEMO_TOURS,
+  getAllBookings, updateBookingStatus, deleteBooking,
+  getAllUsers, updateUserRole, deleteUser as removeUser,
+  getAllReviews, deleteReview,
+  formatDate
+} from "../js/tours-service.js";
+
+let currentUser = null;
+let allTours = [], allBookings = [], allUsers = [], allReviews = [];
+let editingTourId = null;
+let confirmCallback = null;
+let activePage = "dashboard";
+
+// ── TOAST ──
+function showToast(msg, type="info") {
+  const c = document.getElementById("toastContainer");
+  const t = document.createElement("div");
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${type==="success"?"✅":type==="error"?"❌":"✨"}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.animation="toastOut .4s forwards"; setTimeout(()=>t.remove(),400); }, 3500);
+}
+
+// ── CONFIRM MODAL ──
+function showConfirm(title, text, onOk, icon="🗑️") {
+  document.getElementById("confirmIcon").textContent = icon;
+  document.getElementById("confirmTitle").textContent = title;
+  document.getElementById("confirmText").textContent = text;
+  document.getElementById("confirmModal").classList.add("open");
+  confirmCallback = onOk;
+}
+document.getElementById("confirmOk").addEventListener("click", () => {
+  document.getElementById("confirmModal").classList.remove("open");
+  if (confirmCallback) confirmCallback();
+});
+document.getElementById("confirmCancel").addEventListener("click", () => {
+  document.getElementById("confirmModal").classList.remove("open");
+  confirmCallback = null;
+});
+
+// ── AUTH GUARD ──
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href = "login.html"; return; }
+  const admin = await isAdmin(user);
+  if (!admin) {
+    document.getElementById("authGuard").innerHTML = `
+      <div style="text-align:center;color:white">
+        <div style="font-size:3rem;margin-bottom:1rem">🚫</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:2rem;margin-bottom:.75rem">Access Denied</div>
+        <div style="color:rgba(255,255,255,.5);margin-bottom:2rem">You don't have admin privileges.</div>
+        <a href="../index.html" style="background:linear-gradient(135deg,#D4A853,#C2673B);color:white;padding:.875rem 2rem;border-radius:999px;font-family:'Outfit',sans-serif;font-weight:600">← Back to Site</a>
+      </div>`;
+    return;
+  }
+  currentUser = user;
+  document.getElementById("sidebarUserName").textContent = user.displayName || user.email.split("@")[0];
+  document.getElementById("sidebarAvatar").textContent = (user.displayName||user.email||"A")[0].toUpperCase();
+  document.getElementById("authGuard").style.display = "none";
+  await loadAllData();
+  renderPage("dashboard");
+});
+
+// ── LOGOUT ──
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  showConfirm("Sign Out", "Are you sure you want to sign out?", async () => {
+    await logout();
+    window.location.href = "login.html";
+  }, "⏻");
+});
+
+// ── LOAD ALL DATA ──
+async function loadAllData() {
+  try {
+    [allTours, allBookings, allUsers, allReviews] = await Promise.all([
+      getAllToursAdmin(), getAllBookings(), getAllUsers(), getAllReviews()
+    ]);
+    document.getElementById("toursBadge").textContent = allTours.length;
+    document.getElementById("bookingsBadge").textContent = allBookings.filter(b=>b.status==="pending").length || 0;
+  } catch(e) {
+    allTours = DEMO_TOURS;
+    showToast("Using demo data — Firestore rules may need update", "info");
+  }
+}
+
+// ── NAVIGATION ──
+document.querySelectorAll(".sidebar-link[data-page]").forEach(link => {
+  link.addEventListener("click", () => renderPage(link.dataset.page));
+});
+
+document.getElementById("topbarAddTourBtn").addEventListener("click", () => openTourDrawer());
+
+function renderPage(page) {
+  activePage = page;
+  document.querySelectorAll(".sidebar-link[data-page]").forEach(l => l.classList.toggle("active", l.dataset.page===page));
+  const titles = { dashboard:"Dashboard", tours:"Tours Management", bookings:"Bookings", users:"Users", reviews:"Reviews" };
+  document.getElementById("topbarTitle").textContent = titles[page] || page;
+
+  switch(page) {
+    case "dashboard": renderDashboard(); break;
+    case "tours": renderTours(); break;
+    case "bookings": renderBookings(); break;
+    case "users": renderUsers(); break;
+    case "reviews": renderReviews(); break;
+  }
+}
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+function renderDashboard() {
+  const pending = allBookings.filter(b=>b.status==="pending").length;
+  const confirmed = allBookings.filter(b=>b.status==="confirmed").length;
+  const revenue = allBookings.filter(b=>b.status!=="cancelled").reduce((s,b)=>s+(b.totalPrice||0),0);
+
+  document.getElementById("adminContent").innerHTML = `
+    <div class="stats-cards">
+      <div class="stat-card gold">
+        <div class="stat-card-icon">🗺️</div>
+        <div class="stat-card-num">${allTours.length}</div>
+        <div class="stat-card-lbl">Total Tours</div>
+        <div class="stat-card-change up">↑ Active experiences</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-card-icon">📅</div>
+        <div class="stat-card-num">${allBookings.length}</div>
+        <div class="stat-card-lbl">Total Bookings</div>
+        <div class="stat-card-change ${pending>0?"up":""}">⏳ ${pending} pending</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-card-icon">💰</div>
+        <div class="stat-card-num">$${revenue.toLocaleString()}</div>
+        <div class="stat-card-lbl">Total Revenue</div>
+        <div class="stat-card-change up">↑ ${confirmed} confirmed</div>
+      </div>
+      <div class="stat-card terracotta">
+        <div class="stat-card-icon">👥</div>
+        <div class="stat-card-num">${allUsers.length}</div>
+        <div class="stat-card-lbl">Registered Users</div>
+        <div class="stat-card-change up">↑ Growing community</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem">
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Recent Bookings</span>
+          <button class="topbar-btn topbar-btn-ghost btn-sm" onclick="renderPage('bookings')">View All</button>
+        </div>
+        <div class="panel-body no-pad">
+          ${allBookings.length === 0 ? `<div class="empty-state" style="padding:2rem"><div class="empty-icon">📅</div><div class="empty-title">No bookings yet</div></div>` :
+          `<table class="data-table">
+            <thead><tr><th>Guest</th><th>Tour</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody>${allBookings.slice(0,5).map(b=>`
+              <tr>
+                <td><div class="td-title">${b.name||"—"}</div><div class="td-sub">${b.email||""}</div></td>
+                <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.tourTitle||"—"}</td>
+                <td>${b.date||"—"}</td>
+                <td><span class="status status-${b.status||"pending"}">${b.status||"pending"}</span></td>
+              </tr>`).join("")}
+            </tbody>
+          </table>`}
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Tour Performance</span>
+        </div>
+        <div class="panel-body no-pad">
+          <table class="data-table">
+            <thead><tr><th>Tour</th><th>Rating</th><th>Bookings</th></tr></thead>
+            <tbody>${allTours.slice(0,5).map(t=>`
+              <tr>
+                <td><div class="td-title" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.title}</div></td>
+                <td><span style="color:#F0A500">★</span> ${(t.rating||0).toFixed(1)} (${t.reviewCount||0})</td>
+                <td>${allBookings.filter(b=>b.tourId===t.id).length}</td>
+              </tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Quick Actions</span>
+      </div>
+      <div class="panel-body" style="display:flex;flex-wrap:wrap;gap:1rem">
+        <button class="btn btn-gold" onclick="openTourDrawer()">+ Add New Tour</button>
+        <button class="btn btn-ghost" onclick="renderPage('bookings')">📅 Manage Bookings</button>
+        <button class="btn btn-ghost" onclick="renderPage('users')">👥 Manage Users</button>
+        <button class="btn btn-ghost" onclick="renderPage('reviews')">⭐ Moderate Reviews</button>
+        <a href="../index.html" target="_blank" class="btn btn-ghost">🌐 View Website</a>
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════
+// TOURS
+// ═══════════════════════════════════════
+function renderTours(filter="") {
+  let tours = filter ? allTours.filter(t => t.title.toLowerCase().includes(filter.toLowerCase()) || t.category?.toLowerCase().includes(filter.toLowerCase())) : allTours;
+
+  document.getElementById("adminContent").innerHTML = `
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">${tours.length} Tours</span>
+        <div class="panel-actions">
+          <div class="search-bar">
+            <span class="search-bar-icon">🔍</span>
+            <input type="text" placeholder="Search tours..." id="tourSearch" value="${filter}">
+          </div>
+          <button class="topbar-btn topbar-btn-primary" onclick="openTourDrawer()">+ Add Tour</button>
+        </div>
+      </div>
+      <div class="panel-body no-pad">
+        ${tours.length === 0 ? `<div class="empty-state"><div class="empty-icon">🗺️</div><div class="empty-title">No tours found</div><button class="btn btn-gold" onclick="openTourDrawer()">Add First Tour</button></div>` :
+        `<table class="data-table">
+          <thead><tr><th>Tour</th><th>Category</th><th>Price</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="toursTableBody">
+            ${tours.map(t => renderTourRow(t)).join("")}
+          </tbody>
+        </table>`}
+      </div>
+    </div>
+  `;
+
+  document.getElementById("tourSearch")?.addEventListener("input", e => renderTours(e.target.value));
+  bindTourActions();
+}
+
+function renderTourRow(t) {
+  const img = Array.isArray(t.images) ? t.images[0] : t.images;
+  return `
+    <tr id="tour-row-${t.id}">
+      <td>
+        <div style="display:flex;align-items:center;gap:.875rem">
+          <img class="td-img" src="${img}" alt="${t.title}" onerror="this.src='https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=100&q=60'">
+          <div>
+            <div class="td-title" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.title}</div>
+            <div class="td-sub">📍 ${t.location}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="status status-active">${t.category||"—"}</span></td>
+      <td><span class="td-price">$${t.price}</span><div style="font-size:.73rem;color:var(--text-muted)">per person</div></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:.375rem">
+          <span style="color:#F0A500">★</span>
+          <span style="font-weight:600;font-size:.875rem">${(t.rating||0).toFixed(1)}</span>
+          <span style="color:var(--text-muted);font-size:.78rem">(${t.reviewCount||0})</span>
+        </div>
+      </td>
+      <td>
+        ${t.available !== false ? '<span class="status status-active">Available</span>' : '<span class="status status-cancelled">Unavailable</span>'}
+        ${t.featured ? '<span class="status status-pending" style="margin-left:.375rem">Featured</span>' : ''}
+      </td>
+      <td>
+        <div class="td-actions">
+          <button class="td-btn td-btn-view" onclick="window.open('../pages/tour-detail.html?id=${t.id}','_blank')" title="Preview">👁️</button>
+          <button class="td-btn td-btn-edit edit-tour-btn" data-id="${t.id}" title="Edit">✏️</button>
+          <button class="td-btn td-btn-delete delete-tour-btn" data-id="${t.id}" title="Delete">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+}
+
+function bindTourActions() {
+  document.querySelectorAll(".edit-tour-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tour = allTours.find(t => t.id === btn.dataset.id);
+      if (tour) openTourDrawer(tour);
+    });
+  });
+  document.querySelectorAll(".delete-tour-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      const tour = allTours.find(t => t.id === id);
+      showConfirm("Delete Tour", `Delete "${tour?.title}"? This cannot be undone.`, async () => {
+        try {
+          if (!id.startsWith("demo-")) await deleteTour(id);
+          allTours = allTours.filter(t => t.id !== id);
+          document.getElementById("toursBadge").textContent = allTours.length;
+          document.getElementById(`tour-row-${id}`)?.remove();
+          showToast("Tour deleted successfully", "success");
+          if (allTours.length === 0) renderTours();
+        } catch { showToast("Failed to delete tour", "error"); }
+      });
+    });
+  });
+}
+
+// ═══════════════════════════════════════
+// BOOKINGS
+// ═══════════════════════════════════════
+function renderBookings(filter="all") {
+  let bookings = allBookings;
+  if (filter !== "all") bookings = allBookings.filter(b => b.status === filter);
+
+  document.getElementById("adminContent").innerHTML = `
+    <div class="admin-tabs">
+      <button class="admin-tab ${filter==="all"?"active":""}" onclick="renderBookingsFilter('all')">All (${allBookings.length})</button>
+      <button class="admin-tab ${filter==="pending"?"active":""}" onclick="renderBookingsFilter('pending')">Pending (${allBookings.filter(b=>b.status==="pending").length})</button>
+      <button class="admin-tab ${filter==="confirmed"?"active":""}" onclick="renderBookingsFilter('confirmed')">Confirmed (${allBookings.filter(b=>b.status==="confirmed").length})</button>
+      <button class="admin-tab ${filter==="cancelled"?"active":""}" onclick="renderBookingsFilter('cancelled')">Cancelled (${allBookings.filter(b=>b.status==="cancelled").length})</button>
+    </div>
+    <div class="panel">
+      <div class="panel-body no-pad">
+        ${bookings.length === 0 ?
+          `<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No bookings found</div><div class="empty-text">Bookings will appear here when customers book tours.</div></div>` :
+          `<table class="data-table">
+            <thead><tr><th>Guest</th><th>Tour</th><th>Date</th><th>People</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>${bookings.map(b => `
+              <tr id="booking-row-${b.id}">
+                <td>
+                  <div class="td-title">${b.name||"—"}</div>
+                  <div class="td-sub">${b.email||""}</div>
+                  <div class="td-sub">${b.phone||""}</div>
+                </td>
+                <td><div style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.875rem">${b.tourTitle||"—"}</div></td>
+                <td>${b.date||"—"}</td>
+                <td style="text-align:center">${b.people||1}</td>
+                <td><span class="td-price">$${b.totalPrice||0}</span></td>
+                <td><span class="status status-${b.status||"pending"}">${b.status||"pending"}</span></td>
+                <td>
+                  <div class="td-actions">
+                    ${b.status==="pending" ? `<button class="td-btn td-btn-edit confirm-booking-btn" data-id="${b.id}" title="Confirm">✅</button>` : ""}
+                    ${b.status!=="cancelled" ? `<button class="td-btn" style="background:rgba(255,152,0,.1);color:#E65100" onclick="handleCancelBooking('${b.id}')" title="Cancel">⏸</button>` : ""}
+                    <button class="td-btn td-btn-delete del-booking-btn" data-id="${b.id}" title="Delete">🗑️</button>
+                  </div>
+                </td>
+              </tr>`).join("")}
+            </tbody>
+          </table>`}
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll(".confirm-booking-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      try {
+        if (!btn.dataset.id.startsWith("demo")) await updateBookingStatus(btn.dataset.id, "confirmed");
+        const b = allBookings.find(x => x.id === btn.dataset.id);
+        if (b) b.status = "confirmed";
+        showToast("Booking confirmed!", "success");
+        renderBookings(filter);
+      } catch { showToast("Failed to confirm", "error"); }
+    });
+  });
+
+  document.querySelectorAll(".del-booking-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      showConfirm("Delete Booking", "Remove this booking permanently?", async () => {
+        try {
+          if (!btn.dataset.id.startsWith("demo")) await deleteBooking(btn.dataset.id);
+          allBookings = allBookings.filter(b => b.id !== btn.dataset.id);
+          document.getElementById(`booking-row-${btn.dataset.id}`)?.remove();
+          showToast("Booking deleted", "success");
+        } catch { showToast("Failed to delete", "error"); }
+      });
+    });
+  });
+}
+
+window.renderBookingsFilter = (f) => renderBookings(f);
+window.handleCancelBooking = async (id) => {
+  try {
+    if (!id.startsWith("demo")) await updateBookingStatus(id, "cancelled");
+    const b = allBookings.find(x => x.id === id);
+    if (b) b.status = "cancelled";
+    showToast("Booking cancelled", "info");
+    renderBookings();
+  } catch { showToast("Failed to cancel", "error"); }
+};
+
+// ═══════════════════════════════════════
+// USERS
+// ═══════════════════════════════════════
+function renderUsers() {
+  document.getElementById("adminContent").innerHTML = `
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">${allUsers.length} Users</span>
+      </div>
+      <div class="panel-body no-pad">
+        ${allUsers.length === 0 ?
+          `<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">No users yet</div><div class="empty-text">Users will appear here after registration.</div></div>` :
+          `<table class="data-table">
+            <thead><tr><th>User</th><th>Role</th><th>Wishlist</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody>${allUsers.map(u => `
+              <tr id="user-row-${u.id}">
+                <td>
+                  <div style="display:flex;align-items:center;gap:.75rem">
+                    <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#D4A853,#C2673B);display:flex;align-items:center;justify-content:center;color:white;font-weight:600;flex-shrink:0">${(u.name||u.email||"U")[0].toUpperCase()}</div>
+                    <div>
+                      <div class="td-title">${u.name||"—"}</div>
+                      <div class="td-sub">${u.email||""}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <select class="sort-select" onchange="handleRoleChange('${u.id}',this.value)" style="padding:.375rem .75rem;font-size:.8rem">
+                    <option value="user" ${u.role==="user"?"selected":""}>User</option>
+                    <option value="admin" ${u.role==="admin"?"selected":""}>Admin</option>
+                  </select>
+                </td>
+                <td>${(u.wishlist||[]).length} tours</td>
+                <td>${u.createdAt ? new Date(u.createdAt.seconds ? u.createdAt.seconds*1000 : u.createdAt).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) : "—"}</td>
+                <td>
+                  <div class="td-actions">
+                    <button class="td-btn td-btn-delete del-user-btn" data-id="${u.id}" title="Delete">🗑️</button>
+                  </div>
+                </td>
+              </tr>`).join("")}
+            </tbody>
+          </table>`}
+      </div>
+    </div>
+  `;
+
+  window.handleRoleChange = async (uid, role) => {
+    try {
+      await updateUserRole(uid, role);
+      showToast(`Role updated to ${role}`, "success");
+    } catch { showToast("Failed to update role", "error"); }
+  };
+
+  document.querySelectorAll(".del-user-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      showConfirm("Delete User", "Remove this user permanently?", async () => {
+        try {
+          await removeUser(btn.dataset.id);
+          allUsers = allUsers.filter(u => u.id !== btn.dataset.id);
+          document.getElementById(`user-row-${btn.dataset.id}`)?.remove();
+          showToast("User deleted", "success");
+        } catch { showToast("Failed to delete user", "error"); }
+      });
+    });
+  });
+}
+
+// ═══════════════════════════════════════
+// REVIEWS
+// ═══════════════════════════════════════
+function renderReviews() {
+  document.getElementById("adminContent").innerHTML = `
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">${allReviews.length} Reviews</span>
+      </div>
+      <div class="panel-body no-pad">
+        ${allReviews.length === 0 ?
+          `<div class="empty-state"><div class="empty-icon">⭐</div><div class="empty-title">No reviews yet</div></div>` :
+          `<table class="data-table">
+            <thead><tr><th>Reviewer</th><th>Tour</th><th>Rating</th><th>Comment</th><th>Actions</th></tr></thead>
+            <tbody>${allReviews.map(r => `
+              <tr id="review-row-${r.id}">
+                <td><div class="td-title">${r.userName||"Anonymous"}</div></td>
+                <td style="font-size:.82rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.tourId||"—"}</td>
+                <td><span style="color:#F0A500">${"★".repeat(r.rating||5)}</span></td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.85rem">${r.comment||"—"}</td>
+                <td>
+                  <button class="td-btn td-btn-delete del-review-btn" data-id="${r.id}" title="Delete">🗑️</button>
+                </td>
+              </tr>`).join("")}
+            </tbody>
+          </table>`}
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll(".del-review-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      showConfirm("Delete Review", "Remove this review permanently?", async () => {
+        try {
+          if (!btn.dataset.id.startsWith("r")) await deleteReview(btn.dataset.id);
+          allReviews = allReviews.filter(r => r.id !== btn.dataset.id);
+          document.getElementById(`review-row-${btn.dataset.id}`)?.remove();
+          showToast("Review deleted", "success");
+        } catch { showToast("Failed to delete review", "error"); }
+      });
+    });
+  });
+}
+
+// ═══════════════════════════════════════
+// TOUR DRAWER
+// ═══════════════════════════════════════
+window.openTourDrawer = function(tour=null) {
+  editingTourId = tour ? tour.id : null;
+  document.getElementById("drawerTitle").textContent = tour ? "Edit Tour" : "Add New Tour";
+  document.getElementById("editTourId").value = tour?.id || "";
+
+  // Reset / fill form
+  const fields = ["fTitle","fCategory","fLocation","fShortDesc","fDescription","fPrice","fDuration","fGroupSize","fLanguages","fImg1","fImg2","fImg3","fIncluded","fExcluded","fHighlights"];
+  fields.forEach(f => { const el = document.getElementById(f); if(el) el.value = ""; });
+  document.getElementById("fFeatured").checked = false;
+  document.getElementById("fStatus").value = "true";
+  document.getElementById("imgPreviews").innerHTML = "";
+  document.getElementById("drawerError").classList.remove("show");
+  document.getElementById("drawerError").textContent = "";
+
+  if (tour) {
+    document.getElementById("fTitle").value = tour.title||"";
+    document.getElementById("fCategory").value = tour.category||"";
+    document.getElementById("fLocation").value = tour.location||"";
+    document.getElementById("fShortDesc").value = tour.shortDesc||"";
+    document.getElementById("fDescription").value = tour.description||"";
+    document.getElementById("fPrice").value = tour.price||"";
+    document.getElementById("fDuration").value = tour.duration||"";
+    document.getElementById("fGroupSize").value = tour.maxGroupSize||"";
+    document.getElementById("fLanguages").value = (tour.languages||[]).join(", ");
+    document.getElementById("fFeatured").checked = tour.featured||false;
+    document.getElementById("fStatus").value = String(tour.available!==false);
+    const imgs = Array.isArray(tour.images) ? tour.images : [tour.images];
+    if (imgs[0]) document.getElementById("fImg1").value = imgs[0];
+    if (imgs[1]) document.getElementById("fImg2").value = imgs[1];
+    if (imgs[2]) document.getElementById("fImg3").value = imgs[2];
+    document.getElementById("fIncluded").value = (tour.included||[]).join(", ");
+    document.getElementById("fExcluded").value = (tour.excluded||[]).join(", ");
+    document.getElementById("fHighlights").value = (tour.highlights||[]).join(", ");
+    updateImgPreviews();
+  }
+
+  document.getElementById("tourDrawer").classList.add("open");
+};
+
+["fImg1","fImg2","fImg3"].forEach(id => {
+  document.getElementById(id).addEventListener("input", updateImgPreviews);
+});
+
+function updateImgPreviews() {
+  const urls = ["fImg1","fImg2","fImg3"].map(id => document.getElementById(id).value).filter(Boolean);
+  document.getElementById("imgPreviews").innerHTML = urls.map(url => `
+    <div class="img-preview-item">
+      <img src="${url}" alt="Preview" onerror="this.style.display='none'" loading="lazy">
+    </div>`).join("");
+}
+
+function closeTourDrawer() {
+  document.getElementById("tourDrawer").classList.remove("open");
+  editingTourId = null;
+}
+
+document.getElementById("drawerClose").addEventListener("click", closeTourDrawer);
+document.getElementById("drawerCancelBtn").addEventListener("click", closeTourDrawer);
+document.getElementById("tourDrawer").addEventListener("click", e => { if(e.target.classList.contains("drawer-overlay")) closeTourDrawer(); });
+
+document.getElementById("drawerSaveBtn").addEventListener("click", async () => {
+  const errEl = document.getElementById("drawerError");
+  errEl.classList.remove("show"); errEl.textContent = "";
+
+  const title = document.getElementById("fTitle").value.trim();
+  const category = document.getElementById("fCategory").value;
+  const location = document.getElementById("fLocation").value.trim();
+  const description = document.getElementById("fDescription").value.trim();
+  const price = parseFloat(document.getElementById("fPrice").value);
+  const duration = document.getElementById("fDuration").value.trim();
+  const img1 = document.getElementById("fImg1").value.trim();
+
+  if (!title) { errEl.textContent="Tour title is required"; errEl.classList.add("show"); return; }
+  if (!category) { errEl.textContent="Please select a category"; errEl.classList.add("show"); return; }
+  if (!location) { errEl.textContent="Location is required"; errEl.classList.add("show"); return; }
+  if (!description) { errEl.textContent="Description is required"; errEl.classList.add("show"); return; }
+  if (!price || price < 1) { errEl.textContent="Valid price is required"; errEl.classList.add("show"); return; }
+  if (!duration) { errEl.textContent="Duration is required"; errEl.classList.add("show"); return; }
+  if (!img1) { errEl.textContent="At least one image URL is required"; errEl.classList.add("show"); return; }
+
+  const images = ["fImg1","fImg2","fImg3"].map(id => document.getElementById(id).value.trim()).filter(Boolean);
+  const langs = document.getElementById("fLanguages").value.split(",").map(s=>s.trim()).filter(Boolean);
+  const included = document.getElementById("fIncluded").value.split(",").map(s=>s.trim()).filter(Boolean);
+  const excluded = document.getElementById("fExcluded").value.split(",").map(s=>s.trim()).filter(Boolean);
+  const highlights = document.getElementById("fHighlights").value.split(",").map(s=>s.trim()).filter(Boolean);
+
+  const tourData = {
+    title, category, location, description,
+    shortDesc: document.getElementById("fShortDesc").value.trim() || title,
+    price, duration,
+    maxGroupSize: parseInt(document.getElementById("fGroupSize").value)||12,
+    languages: langs.length ? langs : ["English"],
+    images, included, excluded, highlights,
+    featured: document.getElementById("fFeatured").checked,
+    available: document.getElementById("fStatus").value === "true",
+    approved: true
+  };
+
+  const btn = document.getElementById("drawerSaveBtn");
+  btn.textContent = "Saving..."; btn.disabled = true;
+
+  try {
+    if (editingTourId && !editingTourId.startsWith("demo-")) {
+      await updateTour(editingTourId, tourData);
+      const idx = allTours.findIndex(t => t.id === editingTourId);
+      if (idx !== -1) allTours[idx] = { ...allTours[idx], ...tourData };
+      showToast("Tour updated successfully! ✅", "success");
+    } else {
+      const newId = await addTour(tourData);
+      allTours.unshift({ id: newId, ...tourData, rating: 0, reviewCount: 0 });
+      showToast("Tour added successfully! 🎉", "success");
+    }
+    document.getElementById("toursBadge").textContent = allTours.length;
+    closeTourDrawer();
+    if (activePage === "tours") renderTours();
+    else if (activePage === "dashboard") renderDashboard();
+  } catch(e) {
+    errEl.textContent = "Save failed: " + (e.message||"Unknown error");
+    errEl.classList.add("show");
+    showToast("Failed to save tour", "error");
+  } finally {
+    btn.textContent = "Save Tour"; btn.disabled = false;
+  }
+});
+
+// ── SIDEBAR MOBILE ──
+const sidebarToggle = document.getElementById("sidebarToggle");
+if (window.innerWidth <= 1024) { sidebarToggle.style.display = "flex"; }
+sidebarToggle.addEventListener("click", () => document.getElementById("sidebar").classList.toggle("open"));
+window.addEventListener("resize", () => {
+  sidebarToggle.style.display = window.innerWidth <= 1024 ? "flex" : "none";
+  if (window.innerWidth > 1024) document.getElementById("sidebar").classList.remove("open");
+});
+
+// expose for onclick in HTML strings
+window.openTourDrawer = window.openTourDrawer;
+window.renderPage = renderPage;
+window.renderBookings = renderBookings;
+</script>
+</body>
+</html>
