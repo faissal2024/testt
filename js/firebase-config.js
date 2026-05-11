@@ -25,10 +25,12 @@ export const ADMIN_EMAIL = "yahyakun87@gmail.com";
 
 export async function isAdmin(user) {
   if (!user) return false;
+  // Always allow admin email — no Firestore dependency
+  if (user.email === ADMIN_EMAIL) return true;
   try {
     const userDoc = await getDoc(doc(db, "users", user.uid));
     if (userDoc.exists()) return userDoc.data().role === "admin";
-    return user.email === ADMIN_EMAIL;
+    return false;
   } catch { return false; }
 }
 
