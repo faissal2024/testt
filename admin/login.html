@@ -32,22 +32,34 @@ body{font-family:'Outfit',sans-serif;min-height:100vh;display:grid;grid-template
 .form-input{width:100%;padding:.875rem 1.125rem;border:1.5px solid rgba(14,12,10,.12);border-radius:16px;font-size:.9375rem;color:#0E0C0A;background:white;transition:all .2s;outline:none;font-family:'Outfit',sans-serif}
 .form-input:focus{border-color:#D4A853;box-shadow:0 0 0 4px rgba(212,168,83,.12)}
 .form-input::placeholder{color:rgba(14,12,10,.3)}
-.form-error{font-size:.8rem;color:#e63946;margin-top:.375rem;display:none;padding:.5rem .75rem;background:rgba(230,57,70,.06);border-radius:8px;border-left:3px solid #e63946}
+.form-error{font-size:.8rem;color:#e63946;margin-top:.5rem;display:none;padding:.5rem .75rem;background:rgba(230,57,70,.06);border-radius:8px;border-left:3px solid #e63946}
 .form-error.show{display:block}
-.btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:1rem;border-radius:9999px;font-size:.9375rem;font-weight:600;transition:all .3s;cursor:pointer;border:none;font-family:'Outfit',sans-serif}
+.btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:1rem;border-radius:9999px;font-size:.9375rem;font-weight:600;transition:all .3s;cursor:pointer;border:none;font-family:'Outfit',sans-serif;margin-bottom:.875rem}
 .btn-gold{background:linear-gradient(135deg,#D4A853 0%,#F0A500 50%,#C2673B 100%);color:white;box-shadow:0 8px 32px rgba(212,168,83,.3)}
 .btn-gold:hover{transform:translateY(-1px);box-shadow:0 12px 40px rgba(212,168,83,.4)}
 .btn-gold:disabled{opacity:.7;cursor:not-allowed;transform:none}
 .google-btn{display:flex;align-items:center;justify-content:center;gap:.75rem;width:100%;padding:.875rem;border:1.5px solid rgba(14,12,10,.12);border-radius:16px;font-size:.9375rem;font-weight:500;cursor:pointer;transition:all .2s;background:white;font-family:'Outfit',sans-serif;margin-bottom:1.25rem}
 .google-btn:hover{background:#f8f8f8;border-color:rgba(14,12,10,.25)}
+.google-btn:disabled{opacity:.6;cursor:not-allowed}
 .divider{display:flex;align-items:center;gap:1rem;margin:1.25rem 0;color:#8A7A6A;font-size:.8125rem}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(14,12,10,.1)}
 .back-link{display:block;text-align:center;margin-top:1.5rem;font-size:.8125rem;color:#8A7A6A}
 .back-link a{color:#C2673B;font-weight:500}
+.loading-overlay{position:fixed;inset:0;background:rgba(14,12,10,.7);backdrop-filter:blur(8px);z-index:999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
+.loading-overlay.show{display:flex}
+.loading-spinner{width:48px;height:48px;border:3px solid rgba(212,168,83,.2);border-top-color:#D4A853;border-radius:50%;animation:spin .8s linear infinite}
+.loading-msg{color:white;font-size:.9375rem}
+@keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:768px){body{grid-template-columns:1fr}.login-left{display:none}.login-right{padding:2rem}}
 </style>
 </head>
 <body>
+
+<!-- LOADING OVERLAY (shown during Google redirect) -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-msg">Signing you in with Google...</div>
+</div>
 
 <div class="login-left">
   <div class="login-left-content">
@@ -85,9 +97,9 @@ body{font-family:'Outfit',sans-serif;min-height:100vh;display:grid;grid-template
     <div class="form-group">
       <label class="form-label">Password</label>
       <input type="password" class="form-input" id="adminPassword" placeholder="••••••••" autocomplete="current-password">
-      <div class="form-error" id="loginError"></div>
     </div>
-    <div class="form-group" style="margin-top:1.5rem">
+    <div class="form-error" id="loginError"></div>
+    <div class="form-group" style="margin-top:1.25rem">
       <button class="btn btn-gold" id="loginBtn">Sign In to Dashboard</button>
     </div>
     <div class="back-link">Not an admin? <a href="../index.html">Back to website →</a></div>
@@ -95,29 +107,54 @@ body{font-family:'Outfit',sans-serif;min-height:100vh;display:grid;grid-template
 </div>
 
 <script type="module">
-import { auth, onAuthStateChanged, loginWithGoogle, loginWithEmail, isAdmin } from "../js/firebase-config.js";
-
-// If already logged in as admin, redirect
-onAuthStateChanged(auth, async user => {
-  if (user && await isAdmin(user)) {
-    window.location.href = "index.html";
-  }
-});
+import { auth, onAuthStateChanged, loginWithGoogle, loginWithEmail, handleGoogleRedirect, isAdmin } from "../js/firebase-config.js";
 
 const errEl = document.getElementById("loginError");
+const loading = document.getElementById("loadingOverlay");
+
 function showError(msg) { errEl.textContent = msg; errEl.classList.add("show"); }
 function clearError() { errEl.classList.remove("show"); errEl.textContent = ""; }
 
-document.getElementById("googleBtn").addEventListener("click", async () => {
-  clearError();
+// ── Handle Google Redirect Result on page load ──
+async function checkRedirect() {
+  loading.classList.add("show");
   try {
-    const user = await loginWithGoogle();
+    const user = await handleGoogleRedirect();
+    if (user) {
+      const admin = await isAdmin(user);
+      if (admin) { window.location.href = "index.html"; return; }
+      else { showError("This Google account does not have admin privileges."); }
+    }
+  } catch(e) {
+    console.error(e);
+  }
+  loading.classList.remove("show");
+}
+
+// ── If already logged in as admin, go to dashboard ──
+onAuthStateChanged(auth, async user => {
+  if (user) {
     const admin = await isAdmin(user);
-    if (!admin) { showError("This account does not have admin privileges."); return; }
-    window.location.href = "index.html";
-  } catch(e) { showError("Google sign-in failed. Please try again."); }
+    if (admin) { window.location.href = "index.html"; }
+  }
 });
 
+// ── Google Button ──
+document.getElementById("googleBtn").addEventListener("click", async () => {
+  clearError();
+  document.getElementById("googleBtn").disabled = true;
+  document.getElementById("googleBtn").textContent = "Redirecting...";
+  try {
+    await loginWithGoogle();
+    // Page redirects to Google — no code runs after this
+  } catch(e) {
+    showError("Failed to start Google sign-in. Try again.");
+    document.getElementById("googleBtn").disabled = false;
+    document.getElementById("googleBtn").innerHTML = `<svg width="20" height="20" viewBox="0 0 18 18"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg> Continue with Google`;
+  }
+});
+
+// ── Email Login ──
 document.getElementById("loginBtn").addEventListener("click", async () => {
   clearError();
   const email = document.getElementById("adminEmail").value.trim();
@@ -129,13 +166,13 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
   try {
     const user = await loginWithEmail(email, pass);
     const admin = await isAdmin(user);
-    if (!admin) { showError("This account does not have admin privileges."); btn.textContent = "Sign In to Dashboard"; btn.disabled = false; return; }
+    if (!admin) { showError("This account does not have admin privileges."); return; }
     window.location.href = "index.html";
   } catch(e) {
     const code = e.code || "";
-    if (code === "auth/user-not-found" || code === "auth/wrong-password" || code === "auth/invalid-credential") {
-      showError("Invalid email or password. Please try again.");
-    } else if (code === "auth/too-many-requests") {
+    if (code.includes("wrong-password") || code.includes("invalid-credential") || code.includes("user-not-found")) {
+      showError("Invalid email or password.");
+    } else if (code.includes("too-many-requests")) {
       showError("Too many attempts. Please wait a moment.");
     } else {
       showError("Sign in failed. Please try again.");
@@ -145,10 +182,12 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
   }
 });
 
-// Enter key
 document.getElementById("adminPassword").addEventListener("keydown", e => {
   if (e.key === "Enter") document.getElementById("loginBtn").click();
 });
+
+// Run redirect check on page load
+checkRedirect();
 </script>
 </body>
 </html>

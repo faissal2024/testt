@@ -3,7 +3,7 @@
 // ============================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -21,10 +21,8 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const googleProvider = new GoogleAuthProvider();
 
-// ── Admin Email ──
 export const ADMIN_EMAIL = "yahyakun87@gmail.com";
 
-// ── Check if user is admin ──
 export async function isAdmin(user) {
   if (!user) return false;
   try {
@@ -34,7 +32,6 @@ export async function isAdmin(user) {
   } catch { return false; }
 }
 
-// ── Create/update user profile in Firestore ──
 export async function upsertUserProfile(user, extraData = {}) {
   const userRef = doc(db, "users", user.uid);
   const snap = await getDoc(userRef);
@@ -56,7 +53,6 @@ export async function upsertUserProfile(user, extraData = {}) {
   return (await getDoc(userRef)).data();
 }
 
-// ── Auth Functions ──
 export async function signUpWithEmail(name, email, password) {
   const cred = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(cred.user, { displayName: name });
@@ -70,10 +66,23 @@ export async function loginWithEmail(email, password) {
   return cred.user;
 }
 
+// Google Login — Redirect mode (works everywhere including GitHub Pages)
 export async function loginWithGoogle() {
-  const result = await signInWithPopup(auth, googleProvider);
-  await upsertUserProfile(result.user);
-  return result.user;
+  await signInWithRedirect(auth, googleProvider);
+}
+
+export async function handleGoogleRedirect() {
+  try {
+    const result = await getRedirectResult(auth);
+    if (result && result.user) {
+      await upsertUserProfile(result.user);
+      return result.user;
+    }
+    return null;
+  } catch (e) {
+    console.error("Google redirect error:", e);
+    return null;
+  }
 }
 
 export async function logout() {
