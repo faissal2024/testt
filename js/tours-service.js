@@ -199,11 +199,16 @@ export const DEMO_CATEGORIES = [
 // ── TOURS CRUD ──
 export async function getTours(filters = {}) {
   try {
-    let q = collection(db, "tours");
-    const constraints = [where("approved", "==", true)];
-    if (filters.category && filters.category !== "All") constraints.push(where("category", "==", filters.category));
-    const snap = await getDocs(query(q, ...constraints, orderBy("createdAt", "desc")));
+    let constraints = [];
+    if (filters.category && filters.category !== "All") {
+      constraints.push(where("category", "==", filters.category));
+    }
+    const q = constraints.length > 0
+      ? query(collection(db, "tours"), ...constraints)
+      : query(collection(db, "tours"));
+    const snap = await getDocs(q);
     const tours = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Only use demo if Firestore is completely empty
     if (tours.length === 0) return DEMO_TOURS;
     return tours;
   } catch (e) {
@@ -214,7 +219,7 @@ export async function getTours(filters = {}) {
 
 export async function getAllToursAdmin() {
   try {
-    const snap = await getDocs(query(collection(db, "tours"), orderBy("createdAt", "desc")));
+    const snap = await getDocs(collection(db, "tours"));
     const tours = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     if (tours.length === 0) return DEMO_TOURS;
     return tours;

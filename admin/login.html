@@ -9,185 +9,149 @@
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600&family=Outfit:wght@300;400;500;600;700&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Outfit',sans-serif;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;background:#0E0C0A}
-.login-left{background:linear-gradient(160deg,#0E0C0A 0%,#1C1916 60%,#2A1A0A 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem;position:relative;overflow:hidden}
-.login-left::before{content:'';position:absolute;top:0;right:0;width:70%;height:70%;background:radial-gradient(ellipse at 80% 20%,rgba(212,168,83,.12) 0%,transparent 70%)}
-.login-left::after{content:'';position:absolute;bottom:0;left:0;width:60%;height:50%;background:radial-gradient(ellipse at 20% 80%,rgba(194,103,59,.08) 0%,transparent 70%)}
-.login-left-content{position:relative;z-index:1;text-align:center}
-.login-logo{display:flex;align-items:center;justify-content:center;gap:.75rem;margin-bottom:3rem}
-.logo-mark{width:48px;height:48px;background:linear-gradient(135deg,#D4A853,#C2673B);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-weight:600;font-size:1.375rem;color:white}
+.left{background:linear-gradient(160deg,#0E0C0A 0%,#1C1916 60%,#2A1A0A 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem;position:relative;overflow:hidden}
+.left::before{content:'';position:absolute;top:0;right:0;width:70%;height:70%;background:radial-gradient(ellipse at 80% 20%,rgba(212,168,83,.12) 0%,transparent 70%)}
+.left-content{position:relative;z-index:1;text-align:center}
+.logo{display:flex;align-items:center;justify-content:center;gap:.75rem;margin-bottom:3rem}
+.logo-mark{width:48px;height:48px;background:linear-gradient(135deg,#D4A853,#C2673B);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-weight:600;font-size:1.4rem;color:white}
 .logo-text{font-family:'Cormorant Garamond',serif;font-size:1.875rem;font-weight:600;color:white}
 .logo-text span{color:#D4A853}
-.login-hero-title{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:300;color:white;line-height:1.15;margin-bottom:1.25rem}
-.login-hero-title em{font-style:italic;color:#E8C477}
-.login-hero-sub{font-size:.9375rem;color:rgba(255,255,255,.45);line-height:1.7;max-width:340px;margin:0 auto 3rem}
-.feature-list{display:flex;flex-direction:column;gap:1rem;text-align:left}
-.feature-item{display:flex;align-items:center;gap:.875rem;color:rgba(255,255,255,.6);font-size:.875rem}
-.feature-icon{width:36px;height:36px;border-radius:10px;background:rgba(212,168,83,.12);border:1px solid rgba(212,168,83,.2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
-.login-right{background:white;display:flex;align-items:center;justify-content:center;padding:3rem}
-.login-box{width:100%;max-width:420px}
-.login-box-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:600;color:#0E0C0A;margin-bottom:.5rem}
-.login-box-sub{font-size:.9rem;color:#8A7A6A;margin-bottom:2rem}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:300;color:white;line-height:1.15;margin-bottom:1.25rem}
+.hero-title em{font-style:italic;color:#E8C477}
+.hero-sub{font-size:.9375rem;color:rgba(255,255,255,.45);line-height:1.7;max-width:340px;margin:0 auto 3rem}
+.features{display:flex;flex-direction:column;gap:1rem;text-align:left}
+.feature{display:flex;align-items:center;gap:.875rem;color:rgba(255,255,255,.6);font-size:.875rem}
+.ficon{width:36px;height:36px;border-radius:10px;background:rgba(212,168,83,.12);border:1px solid rgba(212,168,83,.2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.right{background:white;display:flex;align-items:center;justify-content:center;padding:3rem}
+.box{width:100%;max-width:400px}
+.box-title{font-family:'Cormorant Garamond',serif;font-size:2.25rem;font-weight:600;color:#0E0C0A;margin-bottom:.375rem}
+.box-sub{font-size:.9rem;color:#8A7A6A;margin-bottom:2rem}
 .form-group{margin-bottom:1.125rem}
-.form-label{display:block;font-size:.8rem;font-weight:600;color:#5A4A3A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem}
-.form-input{width:100%;padding:.875rem 1.125rem;border:1.5px solid rgba(14,12,10,.12);border-radius:16px;font-size:.9375rem;color:#0E0C0A;background:white;transition:all .2s;outline:none;font-family:'Outfit',sans-serif}
-.form-input:focus{border-color:#D4A853;box-shadow:0 0 0 4px rgba(212,168,83,.12)}
-.form-input::placeholder{color:rgba(14,12,10,.3)}
-.form-error{font-size:.8rem;color:#e63946;margin-top:.5rem;display:none;padding:.5rem .75rem;background:rgba(230,57,70,.06);border-radius:8px;border-left:3px solid #e63946}
-.form-error.show{display:block}
-.btn{display:flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:1rem;border-radius:9999px;font-size:.9375rem;font-weight:600;transition:all .3s;cursor:pointer;border:none;font-family:'Outfit',sans-serif;margin-bottom:.875rem}
-.btn-gold{background:linear-gradient(135deg,#D4A853 0%,#F0A500 50%,#C2673B 100%);color:white;box-shadow:0 8px 32px rgba(212,168,83,.3)}
-.btn-gold:hover{transform:translateY(-1px);box-shadow:0 12px 40px rgba(212,168,83,.4)}
-.btn-gold:disabled{opacity:.7;cursor:not-allowed;transform:none}
-.google-btn{display:flex;align-items:center;justify-content:center;gap:.75rem;width:100%;padding:.875rem;border:1.5px solid rgba(14,12,10,.12);border-radius:16px;font-size:.9375rem;font-weight:500;cursor:pointer;transition:all .2s;background:white;font-family:'Outfit',sans-serif;margin-bottom:1.25rem}
-.google-btn:hover{background:#f8f8f8;border-color:rgba(14,12,10,.25)}
-.google-btn:disabled{opacity:.6;cursor:not-allowed}
-.divider{display:flex;align-items:center;gap:1rem;margin:1.25rem 0;color:#8A7A6A;font-size:.8125rem}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(14,12,10,.1)}
-.back-link{display:block;text-align:center;margin-top:1.5rem;font-size:.8125rem;color:#8A7A6A}
-.back-link a{color:#C2673B;font-weight:500}
-.loading-overlay{position:fixed;inset:0;background:rgba(14,12,10,.7);backdrop-filter:blur(8px);z-index:999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
-.loading-overlay.show{display:flex}
-.loading-spinner{width:48px;height:48px;border:3px solid rgba(212,168,83,.2);border-top-color:#D4A853;border-radius:50%;animation:spin .8s linear infinite}
-.loading-msg{color:white;font-size:.9375rem}
-@keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:768px){body{grid-template-columns:1fr}.login-left{display:none}.login-right{padding:2rem}}
+.label{display:block;font-size:.78rem;font-weight:600;color:#5A4A3A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.5rem}
+.input{width:100%;padding:.9rem 1.125rem;border:1.5px solid rgba(14,12,10,.12);border-radius:14px;font-size:.9375rem;color:#0E0C0A;background:white;transition:all .2s;outline:none;font-family:'Outfit',sans-serif}
+.input:focus{border-color:#D4A853;box-shadow:0 0 0 4px rgba(212,168,83,.12)}
+.input::placeholder{color:rgba(14,12,10,.3)}
+.error{font-size:.8rem;color:#e63946;margin-top:.5rem;padding:.5rem .875rem;background:rgba(230,57,70,.06);border-radius:10px;border-left:3px solid #e63946;display:none}
+.error.show{display:block}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;padding:1rem;border-radius:999px;font-size:.9375rem;font-weight:600;transition:all .3s;cursor:pointer;border:none;font-family:'Outfit',sans-serif;margin-top:1.5rem;background:linear-gradient(135deg,#D4A853 0%,#F0A500 50%,#C2673B 100%);color:white;box-shadow:0 8px 32px rgba(212,168,83,.3)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 12px 40px rgba(212,168,83,.4)}
+.btn:disabled{opacity:.7;cursor:not-allowed;transform:none}
+.back{display:block;text-align:center;margin-top:1.5rem;font-size:.8125rem;color:#8A7A6A}
+.back a{color:#C2673B;font-weight:600}
+@media(max-width:768px){body{grid-template-columns:1fr}.left{display:none}.right{padding:2rem}}
 </style>
 </head>
 <body>
 
-<!-- LOADING OVERLAY (shown during Google redirect) -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-spinner"></div>
-  <div class="loading-msg">Signing you in with Google...</div>
-</div>
-
-<div class="login-left">
-  <div class="login-left-content">
-    <div class="login-logo">
+<div class="left">
+  <div class="left-content">
+    <div class="logo">
       <div class="logo-mark">K</div>
       <span class="logo-text">Kech<span>.go</span></span>
     </div>
-    <h1 class="login-hero-title">Manage Your<br><em>Empire</em></h1>
-    <p class="login-hero-sub">Full control over tours, bookings, users, and revenue — all in one beautiful dashboard.</p>
-    <div class="feature-list">
-      <div class="feature-item"><div class="feature-icon">🗺️</div>Add, edit & manage all tours</div>
-      <div class="feature-item"><div class="feature-icon">📅</div>Real-time bookings management</div>
-      <div class="feature-item"><div class="feature-icon">👥</div>User & role management</div>
-      <div class="feature-item"><div class="feature-icon">📊</div>Revenue & performance stats</div>
+    <h1 class="hero-title">Manage Your<br><em>Empire</em></h1>
+    <p class="hero-sub">Full control over tours, bookings, users, and revenue — all in one beautiful dashboard.</p>
+    <div class="features">
+      <div class="feature"><div class="ficon">🗺️</div>Add, edit & manage all tours</div>
+      <div class="feature"><div class="ficon">📅</div>Real-time bookings management</div>
+      <div class="feature"><div class="ficon">👥</div>User & role management</div>
+      <div class="feature"><div class="ficon">📊</div>Revenue & performance stats</div>
     </div>
   </div>
 </div>
 
-<div class="login-right">
-  <div class="login-box">
-    <div class="login-box-title">Admin Access</div>
-    <div class="login-box-sub">Sign in with your administrator account to continue.</div>
-
-    <button class="google-btn" id="googleBtn">
-      <svg width="20" height="20" viewBox="0 0 18 18"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
-      Continue with Google
-    </button>
-
-    <div class="divider">or sign in with email</div>
+<div class="right">
+  <div class="box">
+    <div class="box-title">Admin Access</div>
+    <div class="box-sub">Sign in with your administrator credentials.</div>
 
     <div class="form-group">
-      <label class="form-label">Admin Email</label>
-      <input type="email" class="form-input" id="adminEmail" placeholder="admin@kech.go" autocomplete="email">
+      <label class="label">Email Address</label>
+      <input type="email" class="input" id="email" placeholder="your@email.com" autocomplete="email">
     </div>
     <div class="form-group">
-      <label class="form-label">Password</label>
-      <input type="password" class="form-input" id="adminPassword" placeholder="••••••••" autocomplete="current-password">
+      <label class="label">Password</label>
+      <input type="password" class="input" id="password" placeholder="••••••••" autocomplete="current-password">
     </div>
-    <div class="form-error" id="loginError"></div>
-    <div class="form-group" style="margin-top:1.25rem">
-      <button class="btn btn-gold" id="loginBtn">Sign In to Dashboard</button>
-    </div>
-    <div class="back-link">Not an admin? <a href="../index.html">Back to website →</a></div>
+
+    <div class="error" id="errorMsg"></div>
+
+    <button class="btn" id="loginBtn">Sign In to Dashboard</button>
+
+    <div class="back">Not an admin? <a href="../index.html">Back to website →</a></div>
   </div>
 </div>
 
 <script type="module">
-import { auth, onAuthStateChanged, loginWithGoogle, loginWithEmail, handleGoogleRedirect, isAdmin } from "../js/firebase-config.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-const errEl = document.getElementById("loginError");
-const loading = document.getElementById("loadingOverlay");
+const firebaseConfig = {
+  apiKey: "AIzaSyB2zvwR4-BQndNS1BhlGBB26jh7vHelK-M",
+  authDomain: "fai-net.firebaseapp.com",
+  projectId: "fai-net",
+  storageBucket: "fai-net.firebasestorage.app",
+  messagingSenderId: "735555032841",
+  appId: "1:735555032841:web:41eb374e6b207d7b4da5d8"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const ADMIN_EMAIL = "yahyakun87@gmail.com";
+
+const errEl = document.getElementById("errorMsg");
+const btn = document.getElementById("loginBtn");
 
 function showError(msg) { errEl.textContent = msg; errEl.classList.add("show"); }
-function clearError() { errEl.classList.remove("show"); errEl.textContent = ""; }
+function clearError() { errEl.classList.remove("show"); }
 
-// ── Handle Google Redirect Result on page load ──
-async function checkRedirect() {
-  loading.classList.add("show");
+// إذا مسجل دخول مسبقاً روح مباشرة للداشبورد
+onAuthStateChanged(auth, user => {
+  if (user && user.email === ADMIN_EMAIL) {
+    window.location.href = "index.html";
+  }
+});
+
+btn.addEventListener("click", async () => {
+  clearError();
+  const email = document.getElementById("email").value.trim();
+  const pass = document.getElementById("password").value;
+
+  if (!email) { showError("Please enter your email."); return; }
+  if (!pass)  { showError("Please enter your password."); return; }
+
+  btn.textContent = "Signing in...";
+  btn.disabled = true;
+
   try {
-    const user = await handleGoogleRedirect();
-    if (user) {
-      const admin = await isAdmin(user);
-      if (admin) { window.location.href = "index.html"; return; }
-      else { showError("This Google account does not have admin privileges."); }
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    if (cred.user.email !== ADMIN_EMAIL) {
+      showError("This account does not have admin privileges.");
+      await auth.signOut();
+      return;
     }
-  } catch(e) {
-    console.error(e);
-  }
-  loading.classList.remove("show");
-}
-
-// ── If already logged in as admin, go to dashboard ──
-onAuthStateChanged(auth, async user => {
-  if (user) {
-    const admin = await isAdmin(user);
-    if (admin) { window.location.href = "index.html"; }
-  }
-});
-
-// ── Google Button ──
-document.getElementById("googleBtn").addEventListener("click", async () => {
-  clearError();
-  document.getElementById("googleBtn").disabled = true;
-  document.getElementById("googleBtn").textContent = "Redirecting...";
-  try {
-    await loginWithGoogle();
-    // Page redirects to Google — no code runs after this
-  } catch(e) {
-    showError("Failed to start Google sign-in. Try again.");
-    document.getElementById("googleBtn").disabled = false;
-    document.getElementById("googleBtn").innerHTML = `<svg width="20" height="20" viewBox="0 0 18 18"><path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg> Continue with Google`;
-  }
-});
-
-// ── Email Login ──
-document.getElementById("loginBtn").addEventListener("click", async () => {
-  clearError();
-  const email = document.getElementById("adminEmail").value.trim();
-  const pass = document.getElementById("adminPassword").value;
-  if (!email) { showError("Please enter your email address."); return; }
-  if (!pass) { showError("Please enter your password."); return; }
-  const btn = document.getElementById("loginBtn");
-  btn.textContent = "Signing in..."; btn.disabled = true;
-  try {
-    const user = await loginWithEmail(email, pass);
-    const admin = await isAdmin(user);
-    if (!admin) { showError("This account does not have admin privileges."); return; }
     window.location.href = "index.html";
   } catch(e) {
-    const code = e.code || "";
-    if (code.includes("wrong-password") || code.includes("invalid-credential") || code.includes("user-not-found")) {
-      showError("Invalid email or password.");
-    } else if (code.includes("too-many-requests")) {
-      showError("Too many attempts. Please wait a moment.");
+    const c = e.code || "";
+    if (c.includes("wrong-password") || c.includes("invalid-credential") || c.includes("user-not-found")) {
+      showError("Incorrect email or password. Please try again.");
+    } else if (c.includes("too-many-requests")) {
+      showError("Too many attempts. Please wait a few minutes.");
+    } else if (c.includes("network")) {
+      showError("Network error. Check your connection.");
     } else {
-      showError("Sign in failed. Please try again.");
+      showError("Sign in failed: " + (e.message || "Unknown error"));
     }
   } finally {
-    btn.textContent = "Sign In to Dashboard"; btn.disabled = false;
+    btn.textContent = "Sign In to Dashboard";
+    btn.disabled = false;
   }
 });
 
-document.getElementById("adminPassword").addEventListener("keydown", e => {
-  if (e.key === "Enter") document.getElementById("loginBtn").click();
+document.getElementById("password").addEventListener("keydown", e => {
+  if (e.key === "Enter") btn.click();
 });
-
-// Run redirect check on page load
-checkRedirect();
 </script>
 </body>
 </html>

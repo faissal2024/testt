@@ -262,6 +262,7 @@ onAuthStateChanged(auth, user => {
 async function loadTours() {
   try {
     allTours = await getTours();
+    // Don't fall back to demo if Firestore returned empty — user deleted all tours intentionally
   } catch { allTours = DEMO_TOURS; }
   // set active chip from URL
   if (activeCategory !== "All") {

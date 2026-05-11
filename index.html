@@ -527,12 +527,22 @@ async function loadFeaturedTours() {
   const grid = document.getElementById("featuredToursGrid");
   try {
     const tours = await getTours();
-    const featured = tours.filter(t => t.featured !== false).slice(0, 3);
-    grid.innerHTML = featured.map(tour => renderTourCard(tour)).join("");
+    // Show first 3 tours (featured first if possible)
+    const featured = tours.filter(t => t.featured === true);
+    const rest = tours.filter(t => t.featured !== true);
+    const display = [...featured, ...rest].slice(0, 3);
+    if (display.length === 0) {
+      grid.innerHTML = "<p style='text-align:center;color:var(--text-muted);padding:3rem;grid-column:1/-1'>No tours added yet. Add tours from the admin dashboard.</p>";
+      return;
+    }
+    grid.innerHTML = display.map(tour => renderTourCard(tour)).join("");
     grid.querySelectorAll(".wishlist-btn").forEach(btn => {
       btn.addEventListener("click", e => { e.stopPropagation(); handleWishlist(btn); });
     });
-  } catch { grid.innerHTML = "<p style='text-align:center;color:var(--text-muted);padding:3rem'>Unable to load tours. Please refresh.</p>"; }
+    initReveal();
+  } catch {
+    grid.innerHTML = "<p style='text-align:center;color:var(--text-muted);padding:3rem;grid-column:1/-1'>Unable to load tours. Please refresh.</p>";
+  }
 }
 
 function renderTourCard(tour) {
