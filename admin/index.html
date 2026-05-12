@@ -594,6 +594,7 @@ function renderUsers() {
     <div class="panel">
       <div class="panel-header">
         <span class="panel-title">${allUsers.length} Users</span>
+        <button class="topbar-btn topbar-btn-ghost" onclick="loadAllData().then(()=>renderUsers())">🔄 Refresh</button>
       </div>
       <div class="panel-body no-pad">
         ${allUsers.length === 0 ?
@@ -660,20 +661,36 @@ function renderReviews() {
     <div class="panel">
       <div class="panel-header">
         <span class="panel-title">${allReviews.length} Reviews</span>
+        <button class="topbar-btn topbar-btn-ghost" onclick="loadAllData().then(()=>renderReviews())">🔄 Refresh</button>
       </div>
       <div class="panel-body no-pad">
         ${allReviews.length === 0 ?
-          `<div class="empty-state"><div class="empty-icon">⭐</div><div class="empty-title">No reviews yet</div></div>` :
+          `<div class="empty-state">
+            <div class="empty-icon">⭐</div>
+            <div class="empty-title">No reviews yet</div>
+            <div class="empty-text">Reviews submitted by users will appear here.</div>
+          </div>` :
           `<table class="data-table">
-            <thead><tr><th>Reviewer</th><th>Tour</th><th>Rating</th><th>Comment</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Reviewer</th><th>Tour</th><th>Rating</th><th>Comment</th><th>Date</th><th>Actions</th></tr></thead>
             <tbody>${allReviews.map(r => `
               <tr id="review-row-${r.id}">
-                <td><div class="td-title">${r.userName||"Anonymous"}</div></td>
-                <td style="font-size:.82rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.tourId||"—"}</td>
-                <td><span style="color:#F0A500">${"★".repeat(r.rating||5)}</span></td>
-                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.85rem">${r.comment||"—"}</td>
                 <td>
-                  <button class="td-btn td-btn-delete del-review-btn" data-id="${r.id}" title="Delete">🗑️</button>
+                  <div style="display:flex;align-items:center;gap:.625rem">
+                    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#D4A853,#C2673B);display:flex;align-items:center;justify-content:center;color:white;font-weight:600;font-size:.8rem;flex-shrink:0">${(r.userName||"U")[0].toUpperCase()}</div>
+                    <div class="td-title">${r.userName||"Anonymous"}</div>
+                  </div>
+                </td>
+                <td style="font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-muted)">${r.tourId||"—"}</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:.25rem">
+                    <span style="color:#F0A500;font-size:1rem">${"★".repeat(r.rating||5)}</span>
+                    <span style="font-weight:700;font-size:.875rem">${r.rating||5}/5</span>
+                  </div>
+                </td>
+                <td style="max-width:220px;font-size:.85rem;color:var(--text-secondary)">${r.comment ? (r.comment.length > 80 ? r.comment.slice(0,80)+"..." : r.comment) : "—"}</td>
+                <td style="font-size:.8rem;color:var(--text-muted);white-space:nowrap">${r.createdAt ? new Date(r.createdAt.seconds ? r.createdAt.seconds*1000 : r.createdAt).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) : "—"}</td>
+                <td>
+                  <button class="td-btn td-btn-delete del-review-btn" data-id="${r.id}" title="Delete Review">🗑️</button>
                 </td>
               </tr>`).join("")}
             </tbody>
@@ -686,7 +703,7 @@ function renderReviews() {
     btn.addEventListener("click", () => {
       showConfirm("Delete Review", "Remove this review permanently?", async () => {
         try {
-          if (!btn.dataset.id.startsWith("r")) await deleteReview(btn.dataset.id);
+          await deleteReview(btn.dataset.id);
           allReviews = allReviews.filter(r => r.id !== btn.dataset.id);
           document.getElementById(`review-row-${btn.dataset.id}`)?.remove();
           showToast("Review deleted", "success");

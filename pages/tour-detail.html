@@ -67,6 +67,18 @@
 .review-text{font-size:.9rem;line-height:1.7;color:var(--text-secondary)}
 /* SIMILAR */
 .similar-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem}
+/* REVIEW FORM */
+.review-form{background:var(--sand-light);border-radius:var(--radius-lg);padding:1.75rem;margin-top:1.5rem;border:1px solid rgba(212,168,83,.15)}
+.review-form h4{font-family:var(--font-display);font-size:1.25rem;font-weight:600;margin-bottom:1.25rem}
+.star-picker{display:flex;gap:.375rem;margin-bottom:1.25rem}
+.star-btn{font-size:1.75rem;cursor:pointer;transition:transform .15s;background:none;border:none;color:#ddd;line-height:1}
+.star-btn:hover,.star-btn.active{color:#F0A500;transform:scale(1.15)}
+.review-textarea{width:100%;padding:.875rem 1.125rem;border:1.5px solid rgba(14,12,10,.12);border-radius:var(--radius-md);font-size:.9375rem;color:var(--text-primary);background:white;transition:all .2s;outline:none;resize:vertical;min-height:100px;font-family:var(--font-body)}
+.review-textarea:focus{border-color:var(--gold);box-shadow:0 0 0 4px rgba(212,168,83,.12)}
+.review-submit{margin-top:1rem;background:var(--grad-gold);color:white;padding:.75rem 1.75rem;border-radius:var(--radius-full);font-size:.875rem;font-weight:600;cursor:pointer;border:none;transition:all .3s;font-family:var(--font-body)}
+.review-submit:hover{transform:translateY(-1px);box-shadow:var(--shadow-gold)}
+.review-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.already-reviewed{padding:.875rem 1.125rem;background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.2);border-radius:var(--radius-md);font-size:.875rem;color:#388E3C}
 /* BOOKING CONFIRMATION */
 .booking-success{text-align:center;padding:2rem}
 .booking-success-icon{font-size:3.5rem;margin-bottom:1rem}
@@ -160,7 +172,7 @@
 
 <script type="module">
 import { auth, onAuthStateChanged, loginWithGoogle, loginWithEmail } from "../js/firebase-config.js";
-import { getTourById, DEMO_TOURS, DEMO_REVIEWS, getTourReviews, createBooking, getTours } from "../js/tours-service.js";
+import { getTourById, DEMO_TOURS, DEMO_REVIEWS, getTourReviews, addReview, createBooking, getTours } from "../js/tours-service.js";
 
 const params = new URLSearchParams(window.location.search);
 const tourId = params.get("id");
@@ -305,6 +317,7 @@ function renderTour() {
           <div class="section-block" id="reviewsSection">
             <h3>Traveler Reviews</h3>
             <div id="reviewsList"><div style="color:var(--text-muted);font-size:.9rem">Loading reviews...</div></div>
+            <div id="reviewFormContainer"></div>
           </div>
         </div>
 
@@ -444,23 +457,112 @@ async function loadReviews() {
   if (!container) return;
   try {
     const reviews = await getTourReviews(tourId);
-    if (reviews.length === 0) { container.innerHTML = `<p style="color:var(--text-muted);font-size:.9rem">No reviews yet. Be the first!</p>`; return; }
-    container.innerHTML = reviews.map(r => `
-      <div class="review-card">
-        <div class="review-header">
-          <div class="review-author">
-            <div class="review-avatar">${(r.userName||"U")[0].toUpperCase()}</div>
-            <div>
-              <div class="review-name">${r.userName||"Anonymous"}</div>
-              <div class="review-date">${r.createdAt ? new Date(r.createdAt.seconds ? r.createdAt.seconds*1000 : r.createdAt).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"}) : ""}</div>
+    if (reviews.length === 0) {
+      container.innerHTML = `<p style="color:var(--text-muted);font-size:.9rem;margin-bottom:1.5rem">No reviews yet. Be the first to review!</p>`;
+    } else {
+      container.innerHTML = reviews.map(r => `
+        <div class="review-card">
+          <div class="review-header">
+            <div class="review-author">
+              <div class="review-avatar">${(r.userName||"U")[0].toUpperCase()}</div>
+              <div>
+                <div class="review-name">${r.userName||"Anonymous"}</div>
+                <div class="review-date">${r.createdAt ? new Date(r.createdAt.seconds ? r.createdAt.seconds*1000 : r.createdAt).toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"}) : ""}</div>
+              </div>
             </div>
+            <div class="review-stars">${"★".repeat(r.rating||5)}${"☆".repeat(5-(r.rating||5))}</div>
           </div>
-          <div class="review-stars">${"★".repeat(r.rating||5)}</div>
+          <p class="review-text">${r.comment}</p>
         </div>
-        <p class="review-text">${r.comment}</p>
+      `).join("");
+    }
+    renderReviewForm(reviews);
+  } catch(e) {
+    container.innerHTML = `<p style="color:var(--text-muted)">Reviews unavailable.</p>`;
+    renderReviewForm([]);
+  }
+}
+
+function renderReviewForm(existingReviews) {
+  const formContainer = document.getElementById("reviewFormContainer");
+  if (!formContainer) return;
+
+  if (!currentUser) {
+    formContainer.innerHTML = `
+      <div style="padding:1.25rem;background:rgba(212,168,83,.06);border:1px solid rgba(212,168,83,.2);border-radius:var(--radius-md);font-size:.875rem;color:var(--text-secondary);margin-top:1rem">
+        <span>✍️ </span><a href="#" onclick="document.getElementById('authModal').classList.add('open');return false" style="color:var(--terracotta);font-weight:600">Sign in</a> to leave a review
+      </div>`;
+    return;
+  }
+
+  // Check if user already reviewed this tour
+  const alreadyReviewed = existingReviews.some(r => r.userId === currentUser.uid);
+  if (alreadyReviewed) {
+    formContainer.innerHTML = `<div class="already-reviewed" style="margin-top:1rem">✅ You've already reviewed this tour. Thank you!</div>`;
+    return;
+  }
+
+  let selectedRating = 0;
+
+  formContainer.innerHTML = `
+    <div class="review-form">
+      <h4>Write a Review</h4>
+      <div class="star-picker" id="starPicker">
+        ${[1,2,3,4,5].map(n => `<button class="star-btn" data-val="${n}" aria-label="${n} stars">★</button>`).join("")}
       </div>
-    `).join("");
-  } catch { container.innerHTML = `<p style="color:var(--text-muted)">Reviews unavailable.</p>`; }
+      <div style="font-size:.8rem;color:var(--text-muted);margin-bottom:1rem" id="starLabel">Select your rating</div>
+      <textarea class="review-textarea" id="reviewComment" placeholder="Share your experience — what did you love most?"></textarea>
+      <div class="form-error" id="reviewError" style="margin-top:.5rem"></div>
+      <button class="review-submit" id="reviewSubmitBtn">Submit Review</button>
+    </div>`;
+
+  const labels = ["","Terrible","Poor","Good","Great","Excellent!"];
+
+  // Star picker logic
+  document.querySelectorAll(".star-btn").forEach(btn => {
+    btn.addEventListener("mouseenter", () => {
+      const val = parseInt(btn.dataset.val);
+      document.querySelectorAll(".star-btn").forEach((b,i) => b.classList.toggle("active", i < val));
+    });
+    btn.addEventListener("mouseleave", () => {
+      document.querySelectorAll(".star-btn").forEach((b,i) => b.classList.toggle("active", i < selectedRating));
+    });
+    btn.addEventListener("click", () => {
+      selectedRating = parseInt(btn.dataset.val);
+      document.querySelectorAll(".star-btn").forEach((b,i) => b.classList.toggle("active", i < selectedRating));
+      document.getElementById("starLabel").textContent = labels[selectedRating];
+      document.getElementById("starLabel").style.color = "var(--terracotta)";
+    });
+  });
+
+  // Submit review
+  document.getElementById("reviewSubmitBtn").addEventListener("click", async () => {
+    const errEl = document.getElementById("reviewError");
+    errEl.classList.remove("show"); errEl.textContent = "";
+    const comment = document.getElementById("reviewComment").value.trim();
+    if (selectedRating === 0) { errEl.textContent = "Please select a star rating"; errEl.classList.add("show"); return; }
+    if (comment.length < 10) { errEl.textContent = "Please write at least 10 characters"; errEl.classList.add("show"); return; }
+
+    const btn = document.getElementById("reviewSubmitBtn");
+    btn.textContent = "Submitting..."; btn.disabled = true;
+    try {
+      await addReview({
+        tourId: tourId,
+        userId: currentUser.uid,
+        userName: currentUser.displayName || currentUser.email.split("@")[0],
+        userPhoto: currentUser.photoURL || "",
+        rating: selectedRating,
+        comment: comment
+      });
+      showToast("Review submitted! Thank you 🌟", "success");
+      loadReviews(); // Reload reviews after submit
+    } catch(e) {
+      errEl.textContent = "Failed to submit. Please try again.";
+      errEl.classList.add("show");
+    } finally {
+      btn.textContent = "Submit Review"; btn.disabled = false;
+    }
+  });
 }
 
 async function loadSimilar() {
